@@ -3,6 +3,104 @@ import java.util.*;
 
 public class Clevis {
 
+    // Storage with stable insertion order → natural Z-order.
+    private final Map<String, Shape> shapes = new LinkedHashMap<>();
+    private int nextZ = 1;
+
+    // Shared shape contract .
+    interface Shape {
+        String name();
+        int z();
+        BoundingBox bbox();
+        String listInfo();
+    }
+    // Tiny immutable value object for boxes.
+    static final class BoundingBox {
+        final double x, y, w, h;
+        BoundingBox(double x, double y, double w, double h) {
+            if (w < 0 || h < 0) throw new IllegalArgumentException("width and height must be positive");
+            this.x = x; this.y = y; this.w = w; this.h = h;
+        }
+        @Override public String toString() {
+            return String.format(Locale.US, "%.2f %.2f %.2f %.2f", x, y, w, h);
+        }
+    }
+
+    // =============================
+    // REQ2 —  support drawing a rectangle.
+    // =============================
+    static final class Rectangle implements Shape {
+        private final String name;
+        private final int z;
+        private final double x, y, w, h;
+    //@throws IllegalArgumentException name need to be unique and cannot be null
+	//@throws IllegalArgumentException width and height must be positive
+        Rectangle(String name, int z, double x, double y, double w, double h) {
+            if (name == null || name.isBlank()) throw new IllegalArgumentException("name is required!");
+            if (w <= 0 || h <= 0) throw new IllegalArgumentException("width and height must be positive!!");
+            this.name = name; this.z = z;
+            this.x = x; this.y = y; this.w = w; this.h = h;
+        }
+     //@Override allows the compiler to help you check whether it is actually overridden correctly.
+        @Override public String name() { return name; }
+        @Override public int z() { return z; }
+        @Override public BoundingBox bbox() { return new BoundingBox(x, y, w, h); }
+        @Override public String listInfo() {
+            return String.format(Locale.US, "%s rectangle %.2f %.2f %.2f %.2f", name, x, y, w, h);
+        }
+    }
+
+    // =============================
+    // REQ3 — support drawing a line segment
+    // =============================
+    static final class Line implements Shape {
+        private final String name;
+        private final int z;
+        private final double x1, y1, x2, y2;
+    //@throws IllegalArgumentException name need to be unique and cannot be null
+	//@throws IllegalArgumentException	line needs two distinct points
+        Line(String name, int z, double x1, double y1, double x2, double y2) {
+            if (name == null || name.isBlank()) throw new IllegalArgumentException("name is required!");
+            if (x1 == x2 && y1 == y2) throw new IllegalArgumentException("a line needs two distinct points!!");
+            this.name = name; this.z = z;
+            this.x1 = x1; this.y1 = y1; this.x2 = x2; this.y2 = y2;
+        }
+        
+		//@Override allows the compiler to help you check whether it is actually overridden correctly.
+        @Override public String name() { return name; }
+        @Override public int z() { return z; }
+        @Override public BoundingBox bbox() {
+            double minX = Math.min(x1, x2), minY = Math.min(y1, y2);
+            double maxX = Math.max(x1, x2), maxY = Math.max(y1, y2);
+            return new BoundingBox(minX, minY, maxX - minX, maxY - minY);
+        }
+        @Override public String listInfo() {
+            return String.format(Locale.US, "%s line %.2f %.2f %.2f %.2f", name, x1, y1, x2, y2);
+        }
+    }
+
+    // Public API ,can be used by tiny CLI
+    public Rectangle rectangle(String n, double x, double y, double w, double h) {
+        ensureUnique(n);
+        Rectangle r = new Rectangle(n, nextZ++, x, y, w, h);
+        shapes.put(n, r);
+        return r;
+    }
+    public Line line(String n, double x1, double y1, double x2, double y2) {
+        ensureUnique(n);
+        Line l = new Line(n, nextZ++, x1, y1, x2, y2);
+        shapes.put(n, l);
+        return l;
+    }
+    public Collection<Shape> all() { return shapes.values(); }
+
+	//name need to be unique and cannot be null
+    private void ensureUnique(String n) {
+        if (n == null || n.isBlank()) throw new IllegalArgumentException("name is required");
+        if (shapes.containsKey(n)) throw new IllegalArgumentException("Name already used: " + n);
+    }
+
+	
     public Clevis()
 	{
 		this.shapes = new HashMap<>();
