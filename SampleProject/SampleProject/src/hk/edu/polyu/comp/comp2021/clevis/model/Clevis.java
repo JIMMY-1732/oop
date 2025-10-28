@@ -90,20 +90,20 @@ public class Clevis {
     static final class Circle implements Shape {
         private final String name;
         private final int z;
-        public double centerX, centerY, radius;
+        public double x, y, r;
 
         /**
          * @throws IllegalArgumentException name need to be unique and cannot be null
          * @throws IllegalArgumentException radius must be positive
          */
-        Circle(String name, int z, double centerX, double centerY, double radius) {
+        Circle(String name, int z, double x, double y, double r) {
             if (name == null || name.isBlank()) throw new IllegalArgumentException("name is required!");
             if (radius <= 0) throw new IllegalArgumentException("radius must be positive!!");
             this.name = name; 
             this.z = z;
-            this.centerX = centerX; 
-            this.centerY = centerY; 
-            this.radius = radius;
+            this.x = x; 
+            this.y = y; 
+            this.r = r;
         }
 
         @Override public String name() { return name; }
@@ -111,21 +111,21 @@ public class Clevis {
         
         @Override public BoundingBox bbox() {
             // Bounding box for circle: from (centerX-radius, centerY-radius) to (centerX+radius, centerY+radius)
-            double x = centerX - radius;
-            double y = centerY - radius;
-            double width = 2 * radius;
-            double height = 2 * radius;
+            double x = x - r;
+            double y = y - r;
+            double width = 2 * r;
+            double height = 2 * r;
             return new BoundingBox(x, y, width, height);
         }
         
         @Override public String listInfo() {
-            return String.format(Locale.US, "%s circle %.2f %.2f %.2f", name, centerX, centerY, radius);
+            return String.format(Locale.US, "%s circle %.2f %.2f %.2f", name, x,y, r);
         }
         
         // Getters for internal calculations
-        public double getCenterX() { return centerX; }
-        public double getCenterY() { return centerY; }
-        public double getRadius() { return radius; }
+        public double getx() { return x; }
+        public double gety() { return y; }
+        public double getr() { return r; }
     }
 
     // =============================
@@ -182,9 +182,9 @@ public class Clevis {
         shapes.put(n, l);
         return l;
     }
-	public Circle circle(String n, double centerX, double centerY, double radius) {
+	public Circle circle(String n, double x, double y, double r) {
         ensureUnique(n);
-        Circle c = new Circle(n, nextZ++, centerX, centerY, radius);
+        Circle c = new Circle(n, nextZ++, x, y, r);
         shapes.put(n, c);
         return c;
     }
