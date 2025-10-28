@@ -1,5 +1,10 @@
 package hk.edu.polyu.comp.comp2021.clevis.model;
 import java.util.*;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Clevis {
 	public Clevis()
