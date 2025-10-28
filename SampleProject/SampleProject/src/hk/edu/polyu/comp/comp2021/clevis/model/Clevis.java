@@ -4,7 +4,7 @@ import java.util.*;
 public class Clevis {
 	public Clevis()
 	{
-		this.shapes = new HashMap<>();
+		this.shapes = new LinkedHashMap<>();
         this.drawOrder = new ArrayList<>();
         this.groups = new HashMap<>();
 	}
@@ -18,7 +18,7 @@ public class Clevis {
         String name();
         int z();
         BoundingBox bbox();
-        String listInfo();
+        String listInfo 
     }
     // Tiny immutable value object for boxes.
     static final class BoundingBox {
