@@ -7,7 +7,7 @@ public class Application {
    public static void main(String[] args) {
         Locale.setDefault(Locale.US);
         Clevis clevis = new Clevis();
-        System.out.println("Commands: rectangle | line | listAll | quit");
+        System.out.println("Commands: rectangle | line | quit");
 
         try (BufferedReader br = new BufferedReader(new InputStreamReader(System.in))) {
             String line;
@@ -40,12 +40,7 @@ public class Application {
                             System.out.println("OK line " + n);
                             break;
                         }
-                        case "listall": {
-                            for (Clevis.Shape s : clevis.all()) {
-                                System.out.println(s.listInfo());
-                            }
-                            break;
-                        }
+
                         case "quit": System.out.println("Bye,See you."); return;
                         default: System.out.println("Unknown command: " + cmd);
                     }
