@@ -2,6 +2,12 @@ package hk.edu.polyu.comp.comp2021.clevis.model;
 import java.util.*;
 
 public class Clevis {
+	public Clevis()
+	{
+		this.shapes = new HashMap<>();
+        this.drawOrder = new ArrayList<>();
+        this.groups = new HashMap<>();
+	}
 
     // Storage with stable insertion order → natural Z-order.
     private final Map<String, Shape> shapes = new LinkedHashMap<>();
@@ -78,6 +84,90 @@ public class Clevis {
             return String.format(Locale.US, "%s line %.2f %.2f %.2f %.2f", name, x1, y1, x2, y2);
         }
     }
+	// =============================
+    // REQ4 — support drawing a circle
+    // =============================
+    static final class Circle implements Shape {
+        private final String name;
+        private final int z;
+        public double centerX, centerY, radius;
+
+        /**
+         * @throws IllegalArgumentException name need to be unique and cannot be null
+         * @throws IllegalArgumentException radius must be positive
+         */
+        Circle(String name, int z, double centerX, double centerY, double radius) {
+            if (name == null || name.isBlank()) throw new IllegalArgumentException("name is required!");
+            if (radius <= 0) throw new IllegalArgumentException("radius must be positive!!");
+            this.name = name; 
+            this.z = z;
+            this.centerX = centerX; 
+            this.centerY = centerY; 
+            this.radius = radius;
+        }
+
+        @Override public String name() { return name; }
+        @Override public int z() { return z; }
+        
+        @Override public BoundingBox bbox() {
+            // Bounding box for circle: from (centerX-radius, centerY-radius) to (centerX+radius, centerY+radius)
+            double x = centerX - radius;
+            double y = centerY - radius;
+            double width = 2 * radius;
+            double height = 2 * radius;
+            return new BoundingBox(x, y, width, height);
+        }
+        
+        @Override public String listInfo() {
+            return String.format(Locale.US, "%s circle %.2f %.2f %.2f", name, centerX, centerY, radius);
+        }
+        
+        // Getters for internal calculations
+        public double getCenterX() { return centerX; }
+        public double getCenterY() { return centerY; }
+        public double getRadius() { return radius; }
+    }
+
+    // =============================
+    // REQ5 — support drawing a square
+    // =============================
+    static final class Square implements Shape {
+        private final String name;
+        private final int z;
+        public double x, y, sideLength;
+
+        /**
+         * @throws IllegalArgumentException name need to be unique and cannot be null
+         * @throws IllegalArgumentException side length must be positive
+         */
+        Square(String name, int z, double x, double y, double sideLength) {
+            if (name == null || name.isBlank()) throw new IllegalArgumentException("name is required!");
+            if (sideLength <= 0) throw new IllegalArgumentException("side length must be positive!!");
+            this.name = name; 
+            this.z = z;
+            this.x = x; 
+            this.y = y; 
+            this.sideLength = sideLength;
+        }
+
+        @Override public String name() { return name; }
+        @Override public int z() { return z; }
+        
+        @Override public BoundingBox bbox() {
+            // Bounding box for square is the square itself
+            return new BoundingBox(x, y, sideLength, sideLength);
+        }
+        
+        @Override public String listInfo() {
+            return String.format(Locale.US, "%s square %.2f %.2f %.2f", name, x, y, sideLength);
+        }
+        
+        // Getters for internal calculations
+        public double getX() { return x; }
+        public double getY() { return y; }
+        public double getSideLength() { return sideLength; }
+    }
+
 
     // Public API ,can be used by tiny CLI
     public Rectangle rectangle(String n, double x, double y, double w, double h) {
@@ -92,6 +182,18 @@ public class Clevis {
         shapes.put(n, l);
         return l;
     }
+	public Circle circle(String n, double centerX, double centerY, double radius) {
+        ensureUnique(n);
+        Circle c = new Circle(n, nextZ++, centerX, centerY, radius);
+        shapes.put(n, c);
+        return c;
+    }
+    public Square square(String n, double x, double y, double sideLength) {
+        ensureUnique(n);
+        Square s = new Square(n, nextZ++, x, y, sideLength);
+        shapes.put(n, s);
+        return s;
+    }
     public Collection<Shape> all() { return shapes.values(); }
 
 	//name need to be unique and cannot be null
@@ -101,12 +203,7 @@ public class Clevis {
     }
 
 	
-    public Clevis()
-	{
-		this.shapes = new HashMap<>();
-        this.drawOrder = new ArrayList<>();
-        this.groups = new HashMap<>();
-	}
+
 	// =============================================
     // REQ6: Grouping shapes implementation
     // =============================================
