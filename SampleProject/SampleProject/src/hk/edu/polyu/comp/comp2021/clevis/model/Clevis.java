@@ -35,6 +35,7 @@ public class Clevis {
     // =============================
     // REQ2 —  support drawing a rectangle.
     // =============================
+	// int x,y coordinate w, width h, height z, laters
     static final class Rectangle implements Shape {
         private final String name;
         private final int z;
@@ -59,6 +60,7 @@ public class Clevis {
     // =============================
     // REQ3 — support drawing a line segment
     // =============================
+	// int x1,2,y1,2 4 coordinates  z, laters
     static final class Line implements Shape {
         private final String name;
         private final int z;
