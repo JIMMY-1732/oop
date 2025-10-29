@@ -302,7 +302,35 @@ public class Clevis {
         shapes.remove(groupName);
         drawOrder.remove(group);
     }
+    // =============================
+    // REQ8 — support deleting a shape
+    // =============================
+    public void deleteShape(String name) {
+        if (name == null || name.trim().isEmpty()) {
+            throw new IllegalArgumentException("Shape name cannot be null or empty");
+        }
 
+        Shape s = shapes.get(name);
+        if (s == null) {
+            throw new IllegalArgumentException("Shape not found: " + name);
+        }
+
+        if (s instanceof Group) {
+            Group grp = (Group) s;
+            List<Shape> membersCopy = new ArrayList<>(grp.getShapes());
+
+            for (Shape member : membersCopy) {
+                if (!member.name().equals(name)) { // prevent self-recursion
+                    deleteShape(member.name());
+                }
+            }
+            groups.remove(name);
+        }
+
+        shapes.remove(name);
+        drawOrder.remove(s);
+    }
+	
     // =============================================
     // REQ9: Bounding box calculation implementation
     // =============================================
