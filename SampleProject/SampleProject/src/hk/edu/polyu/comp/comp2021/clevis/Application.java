@@ -2,16 +2,24 @@ package hk.edu.polyu.comp.comp2021.clevis;
 
 import hk.edu.polyu.comp.comp2021.clevis.model.Clevis;
 
-// import tools for safe user input reading and consistent number format
-import java.io.BufferedReader;   // to read user input line by line
-import java.io.IOException;      // to handle input/output exceptions
-import java.io.InputStreamReader;// converts byte stream (System.in) to characters
-import java.util.Locale;         // ensures decimal point format is consistent
+import java.io.*;
+import java.util.*;
 
 public class Application {
 
-   public static void main(String[] args) {
+    private static List<String> commandLog = new ArrayList<>();
+    private static int commandIndex = 0;
+
+    public static void main(String[] args) {
         Locale.setDefault(Locale.US);
+        if (args.length != 4 || !args[0].equalsIgnoreCase("-html") || !args[2].equalsIgnoreCase("-txt")) {
+            System.out.println("Usage: java hk.edu.polyu.comp.comp2021.clevis.Application -html <htmlFile> -txt <txtFile>");
+            return;
+        }
+
+        String htmlPath = args[1];
+        String txtPath = args[3];
+
         Clevis clevis = new Clevis();
         System.out.println("Commands: rectangle | line | quit");
 
@@ -20,6 +28,10 @@ public class Application {
             while ((line = br.readLine()) != null) {
                 line = line.trim();
                 if (line.isEmpty()) continue;
+
+                commandIndex++;
+                commandLog.add(line);  // log command to memory first
+
                 String[] t = line.split("\\s+");
                 String cmd = t[0].toLowerCase(Locale.ROOT);
                 try {
@@ -46,9 +58,12 @@ public class Application {
                             System.out.println("OK line " + n);
                             break;
                         }
-
-                        case "quit": System.out.println("Bye,See you."); return;
-                        default: System.out.println("Unknown command: " + cmd);
+                        case "quit":
+                            System.out.println("Bye, see you.");
+                            saveLogs(htmlPath, txtPath);
+                            return;
+                        default:
+                            System.out.println("Unknown command: " + cmd);
                     }
                 } catch (Exception e) {
                     System.out.println("Error: " + e.getMessage());
@@ -57,5 +72,46 @@ public class Application {
         } catch (IOException ioe) {
             System.err.println("I/O: " + ioe.getMessage());
         }
+    }
+
+    /**
+     * Save command logs to both HTML and TXT files.
+     */
+    private static void saveLogs(String htmlPath, String txtPath) {
+        saveTxtLog(txtPath);
+        saveHtmlLog(htmlPath);
+    }
+
+    private static void saveTxtLog(String txtPath) {
+        try (PrintWriter pw = new PrintWriter(new FileWriter(txtPath))) {
+            for (String cmd : commandLog) {
+                pw.println(cmd);
+            }
+            System.out.println("TXT log saved to: " + txtPath);
+        } catch (IOException e) {
+            System.err.println("Error saving TXT log: " + e.getMessage());
+        }
+    }
+
+    private static void saveHtmlLog(String htmlPath) {
+        try (PrintWriter pw = new PrintWriter(new FileWriter(htmlPath))) {
+            pw.println("<html><head><title>Clevis Command Log</title></head><body>");
+            pw.println("<h2>Clevis Session Log</h2>");
+            pw.println("<table border='1' cellpadding='5' cellspacing='0'>");
+            pw.println("<tr><th>Index</th><th>Command</th></tr>");
+            for (int i = 0; i < commandLog.size(); i++) {
+                pw.printf("<tr><td>%d</td><td>%s</td></tr>%n", i + 1, escapeHtml(commandLog.get(i)));
+            }
+            pw.println("</table></body></html>");
+            System.out.println("HTML log saved to: " + htmlPath);
+        } catch (IOException e) {
+            System.err.println("Error saving HTML log: " + e.getMessage());
+        }
+    }
+
+    private static String escapeHtml(String text) {
+        return text.replace("&", "&amp;")
+                .replace("<", "&lt;")
+                .replace(">", "&gt;");
     }
 }
