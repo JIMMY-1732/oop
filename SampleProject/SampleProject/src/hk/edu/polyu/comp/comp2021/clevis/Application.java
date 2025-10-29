@@ -58,6 +58,35 @@ public class Application {
                             System.out.println("OK line " + n);
                             break;
                         }
+                            case "delete": {
+
+                            if (t.length != 2) {
+                                System.out.println("Usage: delete <shapeName>");
+                                break;
+                            }
+
+                            String shapeName = t[1];
+
+                            if (shapeName == null || shapeName.trim().isEmpty()) {
+                                System.out.println("Error: shape name cannot be empty.");
+                                break;
+                            }
+
+                            try {
+
+                                clevis.deleteShape(shapeName);
+                                System.out.println("Deleted shape: " + shapeName);
+                            } catch (IllegalArgumentException ex) {
+
+                                System.out.println("Couldn’t delete shape: " + ex.getMessage());
+                            } catch (Exception e) {
+
+                                System.out.println("Something went wrong while deleting " + shapeName);
+                                e.printStackTrace(); // TODO: remove or replace with proper logging later
+                            }
+
+                            break;
+                        }
                         case "quit":
                             System.out.println("Bye, see you.");
                             saveLogs(htmlPath, txtPath);
