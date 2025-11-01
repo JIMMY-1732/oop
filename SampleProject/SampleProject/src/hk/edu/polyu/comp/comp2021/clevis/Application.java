@@ -26,7 +26,7 @@ public class Application {
         String txtPath = args[3];
 
         Clevis clevis = new Clevis();
-        System.out.println("Commands: rectangle | line | quit");
+        System.out.println("Commands: rectangle | line | circle | square | quit");
 
         try (BufferedReader br = new BufferedReader(new InputStreamReader(System.in))) {
             String line;
@@ -63,6 +63,35 @@ public class Application {
                             System.out.println("OK line " + n);
                             break;
                         }
+                        case "circle": {
+                            // circle n cx cy r
+                            if (t.length != 5) {
+                                System.out.println("Usage: circle n cx cy r");
+                                break;
+                            }
+                            String n = t[1];
+                            double cx = Double.parseDouble(t[2]);
+                            double cy = Double.parseDouble(t[3]);
+                            double r  = Double.parseDouble(t[4]);
+                            clevis.circle(n, cx, cy, r);
+                            System.out.println("OK circle " + n);
+                            break;
+                        }
+                        case "square": {
+                            // square n x y s
+                            if (t.length != 5) {
+                                System.out.println("Usage: square n x y s");
+                                break;
+                            }
+                            String n = t[1];
+                            double x = Double.parseDouble(t[2]);
+                            double y = Double.parseDouble(t[3]);
+                            double s = Double.parseDouble(t[4]);
+                            clevis.square(n, x, y, s);
+                            System.out.println("OK square " + n);
+                            break;
+                        }
+                            
                             case "delete": {
 
                             if (t.length != 2) {
