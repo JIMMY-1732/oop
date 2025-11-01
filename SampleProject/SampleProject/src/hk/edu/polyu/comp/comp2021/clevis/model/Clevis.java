@@ -2,7 +2,12 @@ package hk.edu.polyu.comp.comp2021.clevis.model;
 import java.util.*;
 
 public class Clevis {
-	public Clevis()
+	private  Map<String, Shape> shapes = new LinkedHashMap<>();
+    private List<Shape> drawOrder = new ArrayList<>();
+    private Map<String, Group> groups = new HashMap<>();
+    
+
+    public Clevis()
 	{
 		this.shapes = new LinkedHashMap<>();
         this.drawOrder = new ArrayList<>();
@@ -10,7 +15,6 @@ public class Clevis {
 	}
 
     // Storage with stable insertion order → natural Z-order.
-    private final Map<String, Shape> shapes = new LinkedHashMap<>();
     private int nextZ = 1;
 
     // Shared shape contract .
@@ -168,32 +172,6 @@ public class Clevis {
         public double getSideLength() { return sideLength; }
     }
 
-
-    // Public API ,can be used by tiny CLI
-    public Rectangle rectangle(String n, double x, double y, double w, double h) {
-        ensureUnique(n);
-        Rectangle r = new Rectangle(n, nextZ++, x, y, w, h);
-        shapes.put(n, r);
-        return r;
-    }
-    public Line line(String n, double x1, double y1, double x2, double y2) {
-        ensureUnique(n);
-        Line l = new Line(n, nextZ++, x1, y1, x2, y2);
-        shapes.put(n, l);
-        return l;
-    }
-	public Circle circle(String n, double centerX, double centerY, double radius) {
-        ensureUnique(n);
-        Circle c = new Circle(n, nextZ++, centerX, centerY, radius);
-        shapes.put(n, c);
-        return c;
-    }
-    public Square square(String n, double x, double y, double sideLength) {
-        ensureUnique(n);
-        Square s = new Square(n, nextZ++, x, y, sideLength);
-        shapes.put(n, s);
-        return s;
-    }
     public Collection<Shape> all() { return shapes.values(); }
 
 	//name need to be unique and cannot be null
@@ -204,207 +182,230 @@ public class Clevis {
 
 	
 
-	// =============================================
-    // REQ6: Grouping shapes implementation
-    // =============================================
+	// =============================
+    // REQ6 — support grouping shapes
+    // =============================
+    static final class Group implements Shape {
+        private final String name;
+        private final int z;
+        private final List<Shape> shapes;
+        
+        /**
+         * @throws IllegalArgumentException if name is null/blank or shapes list is empty
+         */
+        Group(String name, int z, List<Shape> shapes) {
+            if (name == null || name.isBlank()) throw new IllegalArgumentException("name is required!");
+            if (shapes == null || shapes.isEmpty()) throw new IllegalArgumentException("group must contain at least one shape!");
+            this.name = name;
+            this.z = z;
+            this.shapes = new ArrayList<>(shapes); 
+        }
+        
+        @Override public String name() { return name; }
+        @Override public int z() { return z; }
+        
+        @Override public BoundingBox bbox() {
+            if (shapes.isEmpty()) {
+                throw new IllegalStateException("Group is empty!");
+            }
+            
+            // Initialize with the first shape's bounding box
+            BoundingBox first = shapes.get(0).bbox();
+            double minX = first.x;
+            double minY = first.y;
+            double maxX = first.x + first.w;
+            double maxY = first.y + first.h;
+            
+// Find the encompassing bounds of all shapes, where the logic is compare every shape's bbox and update minX, minY, maxX, maxY accordingly
+            for (int i = 1; i < shapes.size(); i++) {
+                BoundingBox box = shapes.get(i).bbox();
+                minX = Math.min(minX, box.x);
+                minY = Math.min(minY, box.y);
+                maxX = Math.max(maxX, box.x + box.w);
+                maxY = Math.max(maxY, box.y + box.h);
+            }
+            
+            return new BoundingBox(minX, minY, maxX - minX, maxY - minY);
+        }
+        
+        @Override public String listInfo() {
+            StringBuilder sb = new StringBuilder();
+            sb.append(name).append(" group");
+            for (Shape s : shapes) {
+                sb.append(" ").append(s.name());
+            }
+            return sb.toString();
+        }
+        
+        // Get a copy of the shapes in this group
+        public List<Shape> getShapes() {
+            return new ArrayList<>(shapes);
+        }
+    }
     
     /**
-     * REQ6: Groups multiple shapes into a single group
-     * @param groupName The name for the new group
-     * @param shapeNames The names of shapes to be grouped
-     * @throws IllegalArgumentException if any shape doesn't exist, group name exists, or insufficient shapes
+     * Groups a list of shapes into a single group shape
+     * @param groupName Name for the new group
+     * @param shapeNames Names of shapes to include in the group
+     * @return The created group
+     * @throws IllegalArgumentException if any shape doesn't exist or is in another group
      */
-    public void groupShapes(String groupName, List<String> shapeNames) {
-        // Validate input parameters
-        if (groupName == null || groupName.trim().isEmpty()) {
-            throw new IllegalArgumentException("Group name cannot be null or empty");
+    public Group group(String groupName, List<String> shapeNames) {
+        if (groupName == null || groupName.isBlank()) {
+            throw new IllegalArgumentException("Group name is required");
         }
-        if (shapeNames == null || shapeNames.size() < 2) {
-            throw new IllegalArgumentException("At least two shapes required for grouping");
+        if (shapeNames == null || shapeNames.isEmpty()) {
+            throw new IllegalArgumentException("At least one shape must be specified");
         }
-        if (shapes.containsKey(groupName) || groups.containsKey(groupName)) {
-            throw new IllegalArgumentException("Name already exists: " + groupName);
-        }
-
-        // Create new group
-        Group group = new Group(groupName);
         
-        // Add shapes to group and validate existence
-        for (String shapeName : shapeNames) {
-            Shape shape = shapes.get(shapeName);
+        // Check if group name already exists
+        ensureUnique(groupName);
+        
+        // Collect shapes and check if they're available
+        List<Shape> groupShapes = new ArrayList<>();
+        for (String name : shapeNames) {
+            Shape shape = shapes.get(name);
             if (shape == null) {
-                throw new IllegalArgumentException("Shape not found: " + shapeName);
+                throw new IllegalArgumentException("Shape not found: " + name);
             }
-            if (shape instanceof Group) {
-                throw new IllegalArgumentException("Cannot group existing groups: " + shapeName);
+            
+            // Check if this shape is already in another group
+            boolean inAnotherGroup = false;
+            for (Group g : groups.values()) {
+                if (g.getShapes().contains(shape)) {
+                    inAnotherGroup = true;
+                    break;
+                }
             }
-            group.addShape(shape);
+            
+            if (inAnotherGroup) {
+                throw new IllegalArgumentException("Shape is already in a group: " + name);
+            }
+            
+            groupShapes.add(shape);
         }
-
-        // Remove individual shapes from top-level access and draw order
-        for (String shapeName : shapeNames) {
-            Shape removedShape = shapes.remove(shapeName);
-            drawOrder.remove(removedShape);
-        }
-
-        // Register the group
-        groups.put(groupName, group);
+        
+        // Create the group
+        Group group = new Group(groupName, nextZ++, groupShapes);
         shapes.put(groupName, group);
         drawOrder.add(group);
+        groups.put(groupName, group);
+        
+        return group;
     }
-
-    // =============================================
-    // REQ7: Ungrouping shapes implementation  
-    // =============================================
-
+    
+    // =============================
+    // REQ7 — support ungrouping a shape
+    // =============================
     /**
-     * REQ7: Ungroups a group shape back into its component shapes
-     * @param groupName The name of the group to ungroup
-     * @throws IllegalArgumentException if group doesn't exist or is not a group
+     * Ungroups a group shape, making its components available again
+     * @param groupName Name of the group to ungroup
+     * @throws IllegalArgumentException if the shape doesn't exist or isn't a group
      */
-    public void ungroupShape(String groupName) {
-        // Validate input
-        if (groupName == null || groupName.trim().isEmpty()) {
+    public void ungroup(String groupName) {
+        if (groupName == null || groupName.isBlank()) {
             throw new IllegalArgumentException("Group name cannot be null or empty");
         }
-
+        
         Shape shape = shapes.get(groupName);
         if (shape == null) {
             throw new IllegalArgumentException("Shape not found: " + groupName);
         }
-
+        
         if (!(shape instanceof Group)) {
             throw new IllegalArgumentException("Shape is not a group: " + groupName);
         }
-
+        
         Group group = (Group) shape;
         
-        // Get component shapes before ungrouping
-        List<Shape> componentShapes = group.getShapes();
-        if (componentShapes.isEmpty()) {
-            throw new IllegalArgumentException("Group is empty: " + groupName);
-        }
-
-        // Add component shapes back to top-level access
-        for (Shape component : componentShapes) {
-            String componentName = component.getName();
-            if (shapes.containsKey(componentName)) {
-                throw new IllegalStateException("Shape name conflict during ungroup: " + componentName);
-            }
-            shapes.put(componentName, component);
-            drawOrder.add(component);
-        }
-
-        // Remove the group from all collections
-        groups.remove(groupName);
+        // Remove the group itself
         shapes.remove(groupName);
         drawOrder.remove(group);
+        groups.remove(groupName);
     }
-
-    // =============================================
-    // REQ9: Bounding box calculation implementation
-    // =============================================
-
-    /**
-     * REQ9: Calculates the bounding box for a specified shape
-     * @param shapeName The name of the shape
-     * @return double array [x, y, width, height] of the bounding box
-     * @throws IllegalArgumentException if shape doesn't exist
-     */
-    public double[] getBoundingBox(String shapeName) {
-        // Validate input
-        if (shapeName == null || shapeName.trim().isEmpty()) {
+    // =============================
+    // REQ8 — support deleting a shape
+    // =============================
+    public void deleteShape(String name) {
+        if (name == null || name.trim().isEmpty()) {
             throw new IllegalArgumentException("Shape name cannot be null or empty");
         }
 
-        Shape shape = shapes.get(shapeName);
-        if (shape == null) {
-            throw new IllegalArgumentException("Shape not found: " + shapeName);
+        Shape s = shapes.get(name);
+        if (s == null) {
+            throw new IllegalArgumentException("Shape not found: " + name);
         }
 
-        Rectangle boundingBox = shape.getBoundingBox();
-        return new double[]{
-            roundToTwoDecimals(boundingBox.getX()),
-            roundToTwoDecimals(boundingBox.getY()), 
-            roundToTwoDecimals(boundingBox.getWidth()),
-            roundToTwoDecimals(boundingBox.getHeight())
-        };
-    }
+        if (s instanceof Group) {
+            Group grp = (Group) s;
+            List<Shape> membersCopy = new ArrayList<>(grp.getShapes());
 
-    // =============================================
-    // REQ11: Finding shape at point implementation
-    // =============================================
-
-    /**
-     * REQ11: Finds the topmost shape that covers the specified point
-     * @param x The x-coordinate of the point
-     * @param y The y-coordinate of the point  
-     * @return The name of the topmost shape covering the point, or null if none
-     */
-    public String findShapeAtPoint(double x, double y) {
-        // Search in reverse draw order (top to bottom - shapes created later have higher Z-index)
-        for (int i = drawOrder.size() - 1; i >= 0; i--) {
-            Shape shape = drawOrder.get(i);
-            if (shape.containsPoint(x, y)) {
-                return shape.getName();
+            for (Shape member : membersCopy) {
+                if (!member.name().equals(name)) { // prevent self-recursion
+                    deleteShape(member.name());
+                }
             }
+            groups.remove(name);
         }
-        return null;
+
+        shapes.remove(name);
+        drawOrder.remove(s);
     }
-
-    // =============================================
-    // REQ12: Intersection check implementation
-    // =============================================
-
+    // =============================
+    // REQ9 — support calculating minimum bounding box
+    // =============================
     /**
-     * REQ12: Checks if two shapes intersect with each other
-     * @param shapeName1 The name of the first shape
-     * @param shapeName2 The name of the second shape
-     * @return true if the shapes intersect, false otherwise
-     * @throws IllegalArgumentException if either shape doesn't exist
+     * Calculates the bounding box of a shape
+     * @param name Name of the shape
+     * @return The bounding box coordinates and dimensions
+     * @throws IllegalArgumentException if the shape doesn't exist
      */
-    public boolean checkIntersection(String shapeName1, String shapeName2) {
-        // Validate inputs
-        if (shapeName1 == null || shapeName2 == null) {
-            throw new IllegalArgumentException("Shape names cannot be null");
+    public BoundingBox boundingBox(String name) {
+        if (name == null || name.isBlank()) {
+            throw new IllegalArgumentException("Shape name cannot be null or empty");
         }
-
-        Shape shape1 = shapes.get(shapeName1);
-        Shape shape2 = shapes.get(shapeName2);
         
-        if (shape1 == null) {
-            throw new IllegalArgumentException("Shape not found: " + shapeName1);
-        }
-        if (shape2 == null) {
-            throw new IllegalArgumentException("Shape not found: " + shapeName2);
-        }
-
-        return shape1.intersects(shape2);
-    }
-
-    // =============================================
-    // Utility methods
-    // =============================================
-
-    /**
-     * Rounds a double value to 2 decimal places as specified in requirements
-     */
-    private double roundToTwoDecimals(double value) {
-        return Math.round(value * 100.0) / 100.0;
-    }
-
-    /**
-     * Adds a shape to the system (for use by other team members implementing shape creation)
-     */
-    public void addShape(Shape shape) {
+        Shape shape = shapes.get(name);
         if (shape == null) {
-            throw new IllegalArgumentException("Shape cannot be null");
+            throw new IllegalArgumentException("Shape not found: " + name);
         }
-        String name = shape.getName();
-        if (shapes.containsKey(name)) {
-            throw new IllegalArgumentException("Shape name already exists: " + name);
-        }
-        shapes.put(name, shape);
-        drawOrder.add(shape);
+        
+        return shape.bbox();
+    }
+    
+    // Fix the existing methods to maintain drawOrder
+
+    public Rectangle rectangle(String n, double x, double y, double w, double h) {
+        ensureUnique(n);
+        Rectangle r = new Rectangle(n, nextZ++, x, y, w, h);
+        shapes.put(n, r);
+        drawOrder.add(r);
+        return r;
+    }
+
+
+    public Line line(String n, double x1, double y1, double x2, double y2) {
+        ensureUnique(n);
+        Line l = new Line(n, nextZ++, x1, y1, x2, y2);
+        shapes.put(n, l);
+        drawOrder.add(l);
+        return l;
+    }
+
+
+    public Circle circle(String n, double x, double y, double r) {
+        ensureUnique(n);
+        Circle c = new Circle(n, nextZ++, x, y, r);
+        shapes.put(n, c);
+        drawOrder.add(c);
+        return c;
+    }
+    public Square square(String n, double x, double y, double sideLength) {
+        ensureUnique(n);
+        Square s = new Square(n, nextZ++, x, y, sideLength);
+        shapes.put(n, s);
+        drawOrder.add(s);
+        return s;
     }
 }
+
