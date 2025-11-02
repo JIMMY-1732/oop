@@ -67,8 +67,8 @@ public class Clevis {
 	// int x1,2,y1,2 4 coordinates  z, laters
     static final class Line implements Shape {
         private final String name;
-        private final int z;
-        private final double x1, y1, x2, y2;
+        public int z;
+        public double x1, y1, x2, y2;
     //@throws IllegalArgumentException name need to be unique and cannot be null
 	//@throws IllegalArgumentException	line needs two distinct points
         Line(String name, int z, double x1, double y1, double x2, double y2) {
@@ -95,7 +95,7 @@ public class Clevis {
     // =============================
     static final class Circle implements Shape {
         private final String name;
-        private final int z;
+        public int z;
         public double centerX, centerY, radius;
 
         /**
@@ -139,7 +139,7 @@ public class Clevis {
     // =============================
     static final class Square implements Shape {
         private final String name;
-        private final int z;
+        public int z;
         public double x, y, sideLength;
 
         /**
@@ -374,7 +374,152 @@ public class Clevis {
         
         return shape.bbox();
     }
-    
+
+    // =============================================
+    // REQ10: The tool should support moving a shape
+    // =============================================
+
+    public void move(String shapeName, double dx, double dy) {
+        if (shapeName == null || shapeName.isBlank()) {
+            throw new IllegalArgumentException("Shape name cannot be null or empty");
+        }
+        Shape target = shapes.get(shapeName);
+        if (target == null) {
+            throw new IllegalArgumentException("Shape not found: " + shapeName);
+        }
+        if (dx == 0 && dy == 0) {
+            return;
+        }
+        moveShape(target, dx, dy, new HashSet<>());
+    }
+
+    private void moveShape(Shape shape, double dx, double dy, Set<Shape> visited) {
+        if (!visited.add(shape)) {
+            return;
+        }
+
+        if (shape instanceof Group) {
+            Group group = (Group) shape;
+            for (Shape member : group.getShapes()) {
+                moveShape(member, dx, dy, visited);
+            }
+            return;
+        }
+
+        if (shape instanceof Rectangle) {
+            Rectangle rect = (Rectangle) shape;
+            Rectangle moved = new Rectangle(rect.name(), rect.z(), rect.x + dx, rect.y + dy, rect.w, rect.h);
+            replaceShapeInCollections(rect, moved);
+        } else if (shape instanceof Line) {
+            Line line = (Line) shape;
+            Line moved = new Line(line.name(), line.z(), line.x1 + dx, line.y1 + dy, line.x2 + dx, line.y2 + dy);
+            replaceShapeInCollections(line, moved);
+        } else if (shape instanceof Circle) {
+            Circle circle = (Circle) shape;
+            circle.centerX += dx;
+            circle.centerY += dy;
+        } else if (shape instanceof Square) {
+            Square square = (Square) shape;
+            square.x += dx;
+            square.y += dy;
+        } else {
+            throw new IllegalArgumentException("Unsupported shape type: " + shape.getClass().getSimpleName());
+        }
+    }
+
+    private void replaceShapeInCollections(Shape oldShape, Shape newShape) {
+        shapes.put(newShape.name(), newShape);
+
+        int index = drawOrder.indexOf(oldShape);
+        if (index >= 0) {
+            drawOrder.set(index, newShape);
+        }
+
+        for (Group group : groups.values()) {
+            List<Shape> members = group.shapes;
+            for (int i = 0; i < members.size(); i++) {
+                if (members.get(i) == oldShape) {
+                    members.set(i, newShape);
+                }
+            }
+        }
+    }
+
+    // =============================
+    // REQ13 — support listing shape information
+    // =============================
+    public String list(String name) {
+        if (name == null || name.isBlank()) {
+            throw new IllegalArgumentException("Shape name cannot be null or empty");
+        }
+
+        Shape shape = shapes.get(name);
+        if (shape == null) {
+            throw new IllegalArgumentException("Shape not found: " + name);
+        }
+
+        return shape.listInfo();
+    }
+
+    // =============================
+    // REQ14 — support listing all shapes
+    // =============================
+    public String listAll() {
+        List<Shape> roots = new ArrayList<>();
+        Set<Shape> nestedShapes = new HashSet<>();
+
+        for (Group group : groups.values()) {
+            collectNestedShapes(group, nestedShapes);
+        }
+
+        for (Shape shape : shapes.values()) {
+            if (!nestedShapes.contains(shape)) {
+                roots.add(shape);
+            }
+        }
+
+        roots.sort(Comparator.comparingInt(Shape::z).reversed());
+
+        StringBuilder sb = new StringBuilder();
+        Set<Shape> visited = new HashSet<>();
+
+        for (Shape root : roots) {
+            appendShapeInfo(root, 0, sb, visited);
+        }
+
+        return sb.toString();
+    }
+
+    private void collectNestedShapes(Group group, Set<Shape> nested) {
+        for (Shape member : group.getShapes()) {
+            if (nested.add(member) && member instanceof Group) {
+                collectNestedShapes((Group) member, nested);
+            }
+        }
+    }
+
+    private void appendShapeInfo(Shape shape, int depth, StringBuilder sb, Set<Shape> visited) {
+        if (!visited.add(shape)) {
+            return;
+        }
+
+        if (sb.length() > 0) {
+            sb.append(System.lineSeparator());
+        }
+
+        String indent = depth <= 0 ? "" : "  ".repeat(depth);
+        sb.append(indent).append(shape.listInfo());
+
+        if (shape instanceof Group) {
+            List<Shape> members = new ArrayList<>(((Group) shape).getShapes());
+            members.sort(Comparator.comparingInt(Shape::z).reversed());
+            for (Shape member : members) {
+                appendShapeInfo(member, depth + 1, sb, visited);
+            }
+        }
+    }
+
+
     // Fix the existing methods to maintain drawOrder
 
     public Rectangle rectangle(String n, double x, double y, double w, double h) {
