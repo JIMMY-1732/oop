@@ -445,6 +445,134 @@ public class Clevis {
         }
     }
 
+// =============================
+// REQ11 — Find topmost shape at point
+// =============================
+public String shapeAt(double x, double y) {
+    // Start from the top (highest Z-index)
+    for (int i = drawOrder.size() - 1; i >= 0; i--) {
+        Shape shape = drawOrder.get(i);
+        if (covers(shape, x, y)) {
+            return shape.name();
+        }
+    }
+    return null; // No shape found
+}
+
+private boolean covers(Shape shape, double x, double y) {
+    if (shape instanceof Group) {
+        Group group = (Group) shape;
+        for (Shape member : group.getShapes()) {
+            if (covers(member, x, y)) {
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    double distance = distanceToShape(shape, x, y);
+    return distance < 0.05;
+}
+
+private double distanceToShape(Shape shape, double x, double y) {
+    // to check whether is this a instanceof Line, Rectangle, Circle, Square, ues give you the distance calculation method
+    if (shape instanceof Line) {
+        return distanceToLine((Line) shape, x, y);
+    } else if (shape instanceof Rectangle rectangle) {
+        return distanceToRectangle(rectangle, x, y);
+    } else if (shape instanceof Circle circle) {
+        return distanceToCircle(circle, x, y);
+    } else if (shape instanceof Square square) {
+        return distanceToSquare(square, x, y);
+    }
+    throw new IllegalArgumentException("Unsupported shape type");
+}
+
+private double distanceToLine(Line line, double x, double y) {
+    double x1 = line.x1, y1 = line.y1, x2 = line.x2, y2 = line.y2;
+    
+    // Calculate distance from point to line segment
+    double lineLength = (x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1);
+    if (lineLength == 0) return Math.sqrt((x - x1) * (x - x1) + (y - y1) * (y - y1));
+    
+    // Calculate projection parameter
+    double t = ((x - x1) * (x2 - x1) + (y - y1) * (y2 - y1)) / lineLength;
+    t = Math.max(0, Math.min(1, t)); // Clamp to line segment
+    
+    // Find closest point on line segment
+    double px = x1 + t * (x2 - x1);
+    double py = y1 + t * (y2 - y1);
+    
+    return Math.sqrt((x - px) * (x - px) + (y - py) * (y - py));
+}
+
+private double distanceToRectangle(Rectangle rect, double x, double y) {
+    double rx = rect.x, ry = rect.y, rw = rect.w, rh = rect.h;
+    
+    // If inside rectangle, find distance to nearest edge
+    if (x >= rx && x <= rx + rw && y >= ry && y <= ry + rh) {
+        return Math.min(
+            Math.min(x - rx, rx + rw - x),
+            Math.min(y - ry, ry + rh - y)
+        );
+    }
+    
+    // Outside rectangle, find distance to nearest edge or corner
+    double dx = Math.max(rx - x, Math.max(0, x - (rx + rw)));
+    double dy = Math.max(ry - y, Math.max(0, y - (ry + rh)));
+    return Math.sqrt(dx * dx + dy * dy);
+}
+
+private double distanceToCircle(Circle circle, double x, double y) {
+    // Distance from point to center minus radius
+    double dx = x - circle.centerX;
+    double dy = y - circle.centerY;
+    double distance = Math.sqrt(dx * dx + dy * dy);
+    return Math.abs(distance - circle.radius);
+}
+
+private double distanceToSquare(Square square, double x, double y) {
+    // Square is a special case of rectangle
+    return distanceToRectangle(
+        new Rectangle(square.name(), square.z(), square.x, square.y, 
+                      square.sideLength, square.sideLength),
+        x, y
+    );
+}
+
+// =============================
+// REQ12 — Check if two shapes intersect
+// =============================
+public boolean intersect(String name1, String name2) {
+    if (name1 == null || name1.isBlank() || name2 == null || name2.isBlank()) {
+        throw new IllegalArgumentException("Shape names cannot be null or empty");
+    }
+    
+    Shape shape1 = shapes.get(name1);
+    Shape shape2 = shapes.get(name2);
+    //I think this is self-explanatory if it is null throw exception else return the intersection result
+    if (shape1 == null) {
+        throw new IllegalArgumentException("Shape not found: " + name1);
+    }
+    if (shape2 == null) {
+        throw new IllegalArgumentException("Shape not found: " + name2);
+    }
+    
+    return doBoundingBoxesIntersect(shape1.bbox(), shape2.bbox());
+}
+
+private boolean doBoundingBoxesIntersect(BoundingBox box1, BoundingBox box2) {
+    // No intersection if one box is to the left/right/top/bottom of the other
+    if (box1.x + box1.w <= box2.x || box2.x + box2.w <= box1.x) {
+        return false;
+    }
+    if (box1.y + box1.h <= box2.y || box2.y + box2.h <= box1.y) {
+        return false;
+    }
+    // Must be intersect
+    return true;
+}
+
     // =============================
     // REQ13 — support listing shape information
     // =============================
