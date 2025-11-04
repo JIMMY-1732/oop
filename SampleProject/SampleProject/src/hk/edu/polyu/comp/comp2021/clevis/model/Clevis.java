@@ -473,21 +473,6 @@ private boolean covers(Shape shape, double x, double y) {
     double distance = distanceToShape(shape, x, y);
     return distance < 0.05;
 }
-
-private double distanceToShape(Shape shape, double x, double y) {
-    // to check whether is this a instanceof Line, Rectangle, Circle, Square, ues give you the distance calculation method
-    if (shape instanceof Line) {
-        return distanceToLine((Line) shape, x, y);
-    } else if (shape instanceof Rectangle rectangle) {
-        return distanceToRectangle(rectangle, x, y);
-    } else if (shape instanceof Circle circle) {
-        return distanceToCircle(circle, x, y);
-    } else if (shape instanceof Square square) {
-        return distanceToSquare(square, x, y);
-    }
-    throw new IllegalArgumentException("Unsupported shape type");
-}
-
 private double distanceToLine(Line line, double x, double y) {
     double x1 = line.x1, y1 = line.y1, x2 = line.x2, y2 = line.y2;
     
@@ -538,6 +523,20 @@ private double distanceToSquare(Square square, double x, double y) {
                       square.sideLength, square.sideLength),
         x, y
     );
+}
+
+private double distanceToShape(Shape shape, double x, double y) {
+    // to check whether is this a instanceof Line, Rectangle, Circle, Square, ues give you the distance calculation method
+    if (shape instanceof Line) {
+        return distanceToLine((Line) shape, x, y);
+    } else if (shape instanceof Rectangle rectangle) {
+        return distanceToRectangle(rectangle, x, y);
+    } else if (shape instanceof Circle circle) {
+        return distanceToCircle(circle, x, y);
+    } else if (shape instanceof Square square) {
+        return distanceToSquare(square, x, y);
+    }
+    throw new IllegalArgumentException("Unsupported shape type");
 }
 
 // =============================
