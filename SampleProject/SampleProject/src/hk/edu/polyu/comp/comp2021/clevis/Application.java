@@ -42,6 +42,7 @@ public class Application {
                 try {
                     switch (cmd) {
                         case "rectangle": {
+                            //req2
                             if (t.length != 6) { System.out.println("Usage: rectangle n x y w h"); break; }
                             String n = t[1];
                             double x = Double.parseDouble(t[2]);
@@ -53,6 +54,7 @@ public class Application {
                             break;
                         }
                         case "line": {
+                            //req3
                             if (t.length != 6) { System.out.println("Usage: line n x1 y1 x2 y2"); break; }
                             String n = t[1];
                             double x1 = Double.parseDouble(t[2]);
@@ -64,11 +66,8 @@ public class Application {
                             break;
                         }
                         case "circle": {
-                            // circle n cx cy r
-                            if (t.length != 5) {
-                                System.out.println("Usage: circle n cx cy r");
-                                break;
-                            }
+                            //req4
+                            if (t.length != 5) { System.out.println("Usage: circle n cx cy r");break;}
                             String n = t[1];
                             double cx = Double.parseDouble(t[2]);
                             double cy = Double.parseDouble(t[3]);
@@ -78,11 +77,8 @@ public class Application {
                             break;
                         }
                         case "square": {
-                            // square n x y s
-                            if (t.length != 5) {
-                                System.out.println("Usage: square n x y s");
-                                break;
-                            }
+                            //req5                            
+                            if (t.length != 5) {System.out.println("Usage: square n x y s");break;}
                             String n = t[1];
                             double x = Double.parseDouble(t[2]);
                             double y = Double.parseDouble(t[3]);
@@ -122,6 +118,7 @@ public class Application {
                             break;
                         }
                         case "quit":
+                            //req15
                             System.out.println("Bye, see you.");
                             saveLogs(htmlPath, txtPath);
                             return;
