@@ -1,0 +1,5 @@
+rectangle rect01 100 100 30 20
+move rect01 10 10
+lsitall
+listall
+quit

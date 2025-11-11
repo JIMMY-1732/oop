@@ -1,0 +1,10 @@
+<html><head><title>Clevis Command Log</title></head><body>
+<h2>Clevis Session Log</h2>
+<table border='1' cellpadding='5' cellspacing='0'>
+<tr><th>Index</th><th>Command</th></tr>
+<tr><td>1</td><td>rectangle rect01 100 100 30 20</td></tr>
+<tr><td>2</td><td>move rect01 10 10</td></tr>
+<tr><td>3</td><td>lsitall</td></tr>
+<tr><td>4</td><td>listall</td></tr>
+<tr><td>5</td><td>quit</td></tr>
+</table></body></html>

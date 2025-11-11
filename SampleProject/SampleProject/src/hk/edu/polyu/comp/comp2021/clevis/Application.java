@@ -122,7 +122,7 @@ public class Application {
                             double dy = Double.parseDouble(t[3]);
 
                             clevis.move(n, dx, dy);
-                            System.out.printf("Moved %s by (%.2f, %.2f)", n, dx, dy);
+                            System.out.printf("> Moved %s by (%.2f, %.2f)\n", n, dx, dy);
                             break;
                         }
                         //req13
