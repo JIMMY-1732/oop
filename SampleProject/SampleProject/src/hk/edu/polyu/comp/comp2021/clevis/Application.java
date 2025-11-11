@@ -111,13 +111,52 @@ public class Application {
 
                             break;
                         }
+                        //req10
+                        case "move":{
+                            if (t.length != 4) {
+                                System.out.println("Usage: move n dx dy");
+                                break;
+                            }
+                            String n = t[1];
+                            double dx = Double.parseDouble(t[2]);
+                            double dy = Double.parseDouble(t[3]);
+
+                            clevis.move(n, dx, dy);
+                            System.out.printf("Moved %s by (%.2f, %.2f)", n, dx, dy);
+                            break;
+                        }
+                        //req13
+                        case "list" :{
+                            if (t.length != 2) {
+                                System.out.println("Usage: list n");
+                                break;
+                            }
+                            String n = t[1];
+                            System.out.println(clevis.list(n));
+                            break;
+                        }
+                        //req14
+                        case "listall":{
+                            if (t.length != 1) {
+                                System.out.println("Usage: listAll");
+                                break;
+                            }
+                            String listing = clevis.listAll();
+                            if (listing.isEmpty()) {
+                                System.out.println("No shapes to list.");
+                            }
+                            else{
+                                System.out.println(listing);
+                            }
+                            break;
+                        }
                         case "quit":
-<<<<<<< Updated upstream
+//<<<<<<< Updated upstream
                             //req15
                             System.out.println("Bye, see you.");
-=======
+//=======
                             System.out.println("You quite this application, please rate us 5 stars and give us full marks.");
->>>>>>> Stashed changes
+//>>>>>>> Stashed changes
                             saveLogs(htmlPath, txtPath);
                             return;
                         default:

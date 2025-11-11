@@ -43,7 +43,7 @@ public class Clevis {
     static final class Rectangle implements Shape {
         private final String name;
         private final int z;
-        private final double x, y, w, h;
+        public final double x, y, w, h;
     //@throws IllegalArgumentException name need to be unique and cannot be null
 	//@throws IllegalArgumentException width and height must be positive
         Rectangle(String name, int z, double x, double y, double w, double h) {
@@ -415,14 +415,27 @@ public class Clevis {
         if (shapeName == null || shapeName.isBlank()) {
             throw new IllegalArgumentException("Shape name cannot be null or empty");
         }
-        Shape target = shapes.get(shapeName);
-        if (target == null) {
-            throw new IllegalArgumentException("Shape not found: " + shapeName);
-        }
+
         if (dx == 0 && dy == 0) {
             return;
         }
-        moveShape(target, dx, dy, new HashSet<>());
+
+        if(shapes.containsKey(shapeName)) {
+            if (shapes.get(shapeName) == null) {
+                throw new IllegalArgumentException("Shape not found: " + shapeName);
+            }
+            moveShape(shapes.get(shapeName), dx, dy, new HashSet<>());
+        }
+
+        if(groups.containsKey(shapeName)) {
+            if (groups.get(shapeName) == null) {
+                throw new IllegalArgumentException("Shape not found: " + shapeName);
+            }
+//            moveShape(groups.get(shapeName), dx, dy, new HashSet<>());
+        }
+
+
+
     }
 
     private void moveShape(Shape shape, double dx, double dy, Set<Shape> visited) {
@@ -430,30 +443,25 @@ public class Clevis {
             return;
         }
 
-        if (shape instanceof Group) {
-            Group group = (Group) shape;
+        if (shape instanceof Group group) {
             for (Shape member : group.getShapes()) {
                 moveShape(member, dx, dy, visited);
             }
             return;
         }
 
-        if (shape instanceof Rectangle) {
-            Rectangle rect = (Rectangle) shape;
+        if (shape instanceof Rectangle rect) {
             Rectangle moved = new Rectangle(rect.name(), rect.z(), rect.x + dx, rect.y + dy, rect.w, rect.h);
             replaceShapeInCollections(rect, moved);
-        } else if (shape instanceof Line) {
-            Line line = (Line) shape;
+        } else if (shape instanceof Line line) {
             Line moved = new Line(line.name(), line.z(), line.x1 + dx, line.y1 + dy, line.x2 + dx, line.y2 + dy);
             replaceShapeInCollections(line, moved);
-        } else if (shape instanceof Circle) {
-            Circle circle = (Circle) shape;
-            circle.centerX += dx;
-            circle.centerY += dy;
-        } else if (shape instanceof Square) {
-            Square square = (Square) shape;
-            square.x += dx;
-            square.y += dy;
+        } else if (shape instanceof Circle circle) {
+            Circle moved = new Circle(circle.name(), circle.z, circle.centerX + dx, circle.centerY + dy, circle.radius);
+            replaceShapeInCollections(circle, moved);
+        } else if (shape instanceof Square square) {
+            Square moved = new Square(square.name(), square.z, square.x + dx, square.y + dy, square.sideLength);
+            replaceShapeInCollections(square, moved);
         } else {
             throw new IllegalArgumentException("Unsupported shape type: " + shape.getClass().getSimpleName());
         }
@@ -468,7 +476,7 @@ public class Clevis {
         }
 
         for (Group group : groups.values()) {
-            List<Shape> members = group.shapes;
+            List<Shape> members = group.getShapes();
             for (int i = 0; i < members.size(); i++) {
                 if (members.get(i) == oldShape) {
                     members.set(i, newShape);
