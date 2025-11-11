@@ -676,42 +676,6 @@ private boolean doBoundingBoxesIntersect(BoundingBox box1, BoundingBox box2) {
                 appendShapeInfo(member, depth + 1, sb, visited);
             }
         }
-    }
-
-
-    // Fix the existing methods to maintain drawOrder
-
-    public Rectangle rectangle(String n, double x, double y, double w, double h) {
-        ensureUnique(n);
-        Rectangle r = new Rectangle(n, nextZ++, x, y, w, h);
-        shapes.put(n, r);
-        drawOrder.add(r);
-        return r;
-    }
-
-
-    public Line line(String n, double x1, double y1, double x2, double y2) {
-        ensureUnique(n);
-        Line l = new Line(n, nextZ++, x1, y1, x2, y2);
-        shapes.put(n, l);
-        drawOrder.add(l);
-        return l;
-    }
-
-
-    public Circle circle(String n, double x, double y, double r) {
-        ensureUnique(n);
-        Circle c = new Circle(n, nextZ++, x, y, r);
-        shapes.put(n, c);
-        drawOrder.add(c);
-        return c;
-    }
-    public Square square(String n, double x, double y, double sideLength) {
-        ensureUnique(n);
-        Square s = new Square(n, nextZ++, x, y, sideLength);
-        shapes.put(n, s);
-        drawOrder.add(s);
-        return s;
-    }
+    } 
 }
 
