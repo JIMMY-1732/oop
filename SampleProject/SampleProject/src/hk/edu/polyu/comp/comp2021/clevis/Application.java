@@ -1,14 +1,8 @@
 package hk.edu.polyu.comp.comp2021.clevis;
 
 import hk.edu.polyu.comp.comp2021.clevis.model.Clevis;
-
-// import tools for safe user input reading and consistent number format
-import java.io.BufferedReader;   // to read user input line by line
-import java.io.IOException;      // to handle input/output exceptions
-import java.io.InputStreamReader;// converts byte stream (System.in) to characters
-import java.util.Locale;         // ensures decimal point format is consistent
-import java.io.*;
-import java.util.*;
+import java.io.*;   // to read user input line by line
+import java.util.*;      // to handle input/output exceptions
 
 public class Application {
 
@@ -118,8 +112,12 @@ public class Application {
                             break;
                         }
                         case "quit":
+<<<<<<< Updated upstream
                             //req15
                             System.out.println("Bye, see you.");
+=======
+                            System.out.println("You quite this application, please rate us 5 stars and give us full marks.");
+>>>>>>> Stashed changes
                             saveLogs(htmlPath, txtPath);
                             return;
                         default:
