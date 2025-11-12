@@ -1,5 +1,11 @@
-rectangle rect01 100 100 30 20
-move rect01 10 10
-lsitall
+circle cir01 20 20 10
+line line1 10 10 20 20
+square squr01 10 10 20
+listall
+move squr01 10 10
+move line1 10 10
+move cir01 10 10
+listall
+delete squr01
 listall
 quit

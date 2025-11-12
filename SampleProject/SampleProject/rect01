@@ -2,9 +2,15 @@
 <h2>Clevis Session Log</h2>
 <table border='1' cellpadding='5' cellspacing='0'>
 <tr><th>Index</th><th>Command</th></tr>
-<tr><td>1</td><td>rectangle rect01 100 100 30 20</td></tr>
-<tr><td>2</td><td>move rect01 10 10</td></tr>
-<tr><td>3</td><td>lsitall</td></tr>
+<tr><td>1</td><td>circle cir01 20 20 10</td></tr>
+<tr><td>2</td><td>line line1 10 10 20 20</td></tr>
+<tr><td>3</td><td>square squr01 10 10 20</td></tr>
 <tr><td>4</td><td>listall</td></tr>
-<tr><td>5</td><td>quit</td></tr>
+<tr><td>5</td><td>move squr01 10 10</td></tr>
+<tr><td>6</td><td>move line1 10 10</td></tr>
+<tr><td>7</td><td>move cir01 10 10</td></tr>
+<tr><td>8</td><td>listall</td></tr>
+<tr><td>9</td><td>delete squr01</td></tr>
+<tr><td>10</td><td>listall</td></tr>
+<tr><td>11</td><td>quit</td></tr>
 </table></body></html>

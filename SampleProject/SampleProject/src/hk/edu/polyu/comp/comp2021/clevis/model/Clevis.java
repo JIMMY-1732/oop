@@ -2,9 +2,10 @@ package hk.edu.polyu.comp.comp2021.clevis.model;
 import java.util.*;
 
 public class Clevis {
-	private  Map<String, Shape> shapes = new LinkedHashMap<>();
-    private List<Shape> drawOrder = new ArrayList<>();
-    private Map<String, Group> groups = new HashMap<>();
+    public static Group group;
+    public  Map<String, Shape> shapes = new LinkedHashMap<>();
+    public List<Shape> drawOrder = new ArrayList<>();
+    public Map<String, Group> groups = new HashMap<>();
     
 
     public Clevis()
@@ -25,8 +26,8 @@ public class Clevis {
         String listInfo();
     }
     // Tiny immutable value object for boxes.
-    static final class BoundingBox {
-        final double x, y, w, h;
+    public static final class BoundingBox {
+        public final double x, y, w, h;
         BoundingBox(double x, double y, double w, double h) {
             if (w < 0 || h < 0) throw new IllegalArgumentException("width and height must be positive");
             this.x = x; this.y = y; this.w = w; this.h = h;
@@ -40,7 +41,7 @@ public class Clevis {
     // REQ2 —  support drawing a rectangle.
     // =============================
 	// int x,y coordinate w, width h, height z, laters
-    static final class Rectangle implements Shape {
+    public final class Rectangle implements Shape {
         private final String name;
         private final int z;
         public final double x, y, w, h;
@@ -65,7 +66,7 @@ public class Clevis {
     // REQ3 — support drawing a line segment
     // =============================
 	// int x1,2,y1,2 4 coordinates  z, laters
-    static final class Line implements Shape {
+    public static final class Line implements Shape {
         private final String name;
         public int z;
         public double x1, y1, x2, y2;
@@ -93,7 +94,7 @@ public class Clevis {
 	// =============================
     // REQ4 — support drawing a circle
     // =============================
-    static final class Circle implements Shape {
+    public static final class Circle implements Shape {
         private final String name;
         public int z;
         public double centerX, centerY, radius;
@@ -137,7 +138,7 @@ public class Clevis {
     // =============================
     // REQ5 — support drawing a square
     // =============================
-    static final class Square implements Shape {
+    public static final class Square implements Shape {
         private final String name;
         public int z;
         public double x, y, sideLength;
@@ -187,7 +188,7 @@ public class Clevis {
 	// =============================
     // REQ6 — support grouping shapes
     // =============================
-    static final class Group implements Shape {
+    public static final class Group implements Shape {
         private final String name;
         private final int z;
         private final List<Shape> shapes;
