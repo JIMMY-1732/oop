@@ -1,6 +1,7 @@
 package hk.edu.polyu.comp.comp2021.clevis;
 
 import hk.edu.polyu.comp.comp2021.clevis.model.Clevis;
+import javax.swing.SwingUtilities;
 import java.io.*;   // to read user input line by line
 import java.util.*;      // to handle input/output exceptions
 
@@ -11,6 +12,15 @@ public class Application {
 
     public static void main(String[] args) {
         Locale.setDefault(Locale.US);
+                boolean useGui = false;
+        for (String a : args) if ("-gui".equalsIgnoreCase(a)) useGui = true;
+        Clevis clevis = new Clevis();
+        ViewerFrame viewer = null;
+
+        if (useGui) {
+            ViewerFrame vf = new ViewerFrame(clevis);
+            viewer = vf;
+            SwingUtilities.invokeLater(() -> vf.setVisible(true));
         if (args.length != 4 || !args[0].equalsIgnoreCase("-html") || !args[2].equalsIgnoreCase("-txt")) {
             System.out.println("Usage: java hk.edu.polyu.comp.comp2021.clevis.Application -html <htmlFile> -txt <txtFile>");
             return;
