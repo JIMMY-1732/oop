@@ -19,12 +19,17 @@ public class Clevis {
     private int nextZ = 1;
 
     // Shared shape contract .
-    interface Shape {
+    public interface Shape {
         String name();
         int z();
         BoundingBox bbox();
         String listInfo();
     }
+	
+    public Collection<Shape> all() {
+        return shapes.values();
+    }
+	
     // Tiny immutable value object for boxes.
     public static final class BoundingBox {
         public final double x, y, w, h;
@@ -60,6 +65,10 @@ public class Clevis {
         @Override public String listInfo() {
             return String.format(Locale.US, "%s rectangle %.2f %.2f %.2f %.2f", name, x, y, w, h);
         }
+		public double x() { return x; }
+        public double y() { return y; }
+        public double w() { return w; }
+        public double h() { return h; }
     }
 
     // =============================
@@ -90,6 +99,10 @@ public class Clevis {
         @Override public String listInfo() {
             return String.format(Locale.US, "%s line %.2f %.2f %.2f %.2f", name, x1, y1, x2, y2);
         }
+		public double x1() { return x1; }
+        public double y1() { return y1; }
+        public double x2() { return x2; }
+        public double y2() { return y2; }
     }
 	// =============================
     // REQ4 — support drawing a circle
@@ -129,10 +142,10 @@ public class Clevis {
             return String.format(Locale.US, "%s circle %.2f %.2f %.2f", name, centerX, centerY, radius);
         }
         
-        // Getters for internal calculations
-        public double getCenterX() { return centerX; }
-        public double getCenterY() { return centerY; }
-        public double getRadius() { return radius; }
+       // Getters for internal calculations
+        public double cx() { return centerX; }
+        public double cy() { return centerY; }
+        public double r()  { return radius; }
     }
 
     // =============================
@@ -170,9 +183,9 @@ public class Clevis {
         }
         
         // Getters for internal calculations
-        public double getX() { return x; }
-        public double getY() { return y; }
-        public double getSideLength() { return sideLength; }
+        public double x() { return x; }
+        public double y() { return y; }
+        public double s() { return sideLength; }
     }
 
     public Collection<Shape> all() { return shapes.values(); }
