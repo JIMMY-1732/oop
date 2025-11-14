@@ -65,6 +65,8 @@ public class Clevis {
         @Override public String listInfo() {
             return String.format(Locale.US, "%s rectangle %.2f %.2f %.2f %.2f", name, x, y, w, h);
         }
+
+		// Getters for internal calculations
 		public double x() { return x; }
         public double y() { return y; }
         public double w() { return w; }
@@ -99,6 +101,8 @@ public class Clevis {
         @Override public String listInfo() {
             return String.format(Locale.US, "%s line %.2f %.2f %.2f %.2f", name, x1, y1, x2, y2);
         }
+
+		// Getters for internal calculations
 		public double x1() { return x1; }
         public double y1() { return y1; }
         public double x2() { return x2; }
