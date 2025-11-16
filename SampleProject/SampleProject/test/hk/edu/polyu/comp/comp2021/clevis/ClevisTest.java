@@ -65,16 +65,24 @@ public class ClevisTest {
         assertTrue(group.listInfo().contains("g1 group r1 c1"));
     }
 
-//    @Test
-//    public void testUngroup() {
-//        clevis.rectangle("r1", 0, 0, 2, 2);
-//        clevis.circle("c1", 1, 1, 1);
-//        List<String> shapes = Arrays.asList("r1", "c1");
-//        clevis.group("g1", shapes);
-//        clevis.ungroup("g1");
-//        assertNull(Clevis.group.getShapes().get("g1"));
-//    }
-
+    @Test  // Make sure this annotation is present
+    public void testUngroup() {
+        try {
+        clevis.rectangle("r1", 0, 0, 2, 2);
+        clevis.circle("c1", 1, 1, 1);
+        List<String> shapes = Arrays.asList("r1", "c1");
+        clevis.group("g1", shapes);
+        clevis.ungroup("g1");
+        
+        // Add debugging statements
+        System.out.println("Group g1 contents: " + Clevis.group.getShapes().get("g1"));
+        
+        assertNull(Clevis.group.getShapes().get("g1"));
+    } catch (Exception e) {
+        e.printStackTrace();
+        fail("Test failed with exception: " + e.getMessage());
+    }
+}
     // Move operation tests
     @Test
     public void testMoveShape() {
