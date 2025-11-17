@@ -1,7 +1,7 @@
 package hk.edu.polyu.comp.comp2021.clevis.model;
 
-import hk.edu.polyu.comp.comp2021.clevis.model.shapes.*;
 import hk.edu.polyu.comp.comp2021.clevis.model.operations.*;
+import hk.edu.polyu.comp.comp2021.clevis.model.shapes.*;
 import hk.edu.polyu.comp.comp2021.clevis.model.util.*;
 import java.util.*;
 
@@ -17,12 +17,12 @@ public class Clevis {
     public Map<String, Group> groups = new HashMap<>();
     
     // Operation handlers
-    private ShapeFactory factory;
-    private GroupManager groupManager;
-    private ShapeManager shapeManager;
-    private ShapeMover mover;
-    private ShapeQueryHandler queryHandler;
-    private ShapeListFormatter formatter;
+    private final ShapeFactory factory;
+    private final GroupManager groupManager;
+    private final ShapeManager shapeManager;
+    private final ShapeMover mover;
+    private final ShapeQueryHandler queryHandler;
+    private final ShapeListFormatter formatter;
     
     /**
      * Initializes a new Clevis instance with all necessary components.
@@ -31,7 +31,6 @@ public class Clevis {
         this.shapes = new LinkedHashMap<>();
         this.drawOrder = new ArrayList<>();
         this.groups = new HashMap<>();
-        
         this.factory = new ShapeFactory(shapes, drawOrder);
         this.groupManager = new GroupManager(shapes, drawOrder, groups, factory);
         this.shapeManager = new ShapeManager(shapes, drawOrder, groups);

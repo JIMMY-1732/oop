@@ -191,6 +191,7 @@ public class Application {
             }
         }
     }
+}
 
         /**
          * Save command logs to both HTML and TXT files.
