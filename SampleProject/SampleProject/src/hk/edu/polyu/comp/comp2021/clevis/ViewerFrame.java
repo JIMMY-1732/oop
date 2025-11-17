@@ -1,6 +1,8 @@
 package hk.edu.polyu.comp.comp2021.clevis;
 
 import hk.edu.polyu.comp.comp2021.clevis.model.Clevis;
+import hk.edu.polyu.comp.comp2021.clevis.model.shapes.*;
+
 
 import javax.swing.*;
 import java.awt.*;

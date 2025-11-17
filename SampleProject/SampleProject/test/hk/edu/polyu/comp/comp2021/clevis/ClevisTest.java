@@ -1,6 +1,7 @@
 package hk.edu.polyu.comp.comp2021.clevis;
 
 import hk.edu.polyu.comp.comp2021.clevis.model.Clevis;
+import hk.edu.polyu.comp.comp2021.clevis.model.shapes.*;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -21,25 +22,25 @@ public class ClevisTest {
     // Basic shape creation tests
     @Test
     public void testRectangleCreation() {
-        Clevis.Rectangle rect = clevis.rectangle("rect1", 0, 0, 5, 3);
+        Rectangle rect = clevis.rectangle("rect1", 0, 0, 5, 3);
         assertEquals("rect1 rectangle 0.00 0.00 5.00 3.00", rect.listInfo());
     }
 
     @Test
     public void testLineCreation() {
-        Clevis.Line line = clevis.line("line1", 0, 0, 5, 5);
+        Line line = clevis.line("line1", 0, 0, 5, 5);
         assertEquals("line1 line 0.00 0.00 5.00 5.00", line.listInfo());
     }
 
     @Test
     public void testCircleCreation() {
-        Clevis.Circle circle = clevis.circle("circle1", 3, 3, 2);
+        Circle circle = clevis.circle("circle1", 3, 3, 2);
         assertEquals("circle1 circle 3.00 3.00 2.00", circle.listInfo());
     }
 
     @Test
     public void testSquareCreation() {
-        Clevis.Square square = clevis.square("square1", 1, 1, 4);
+        Square square = clevis.square("square1", 1, 1, 4);
         assertEquals("square1 square 1.00 1.00 4.00", square.listInfo());
     }
 
@@ -61,7 +62,7 @@ public class ClevisTest {
         clevis.rectangle("r1", 0, 0, 2, 2);
         clevis.circle("c1", 1, 1, 1);
         List<String> shapes = Arrays.asList("r1", "c1");
-        Clevis.Group group = clevis.group("g1", shapes);
+        Group group = clevis.group("g1", shapes);
         assertTrue(group.listInfo().contains("g1 group r1 c1"));
     }
 
@@ -86,9 +87,9 @@ public class ClevisTest {
     // Move operation tests
     @Test
     public void testMoveShape() {
-        Clevis.Rectangle rect = clevis.rectangle("rect1", 0, 0, 2, 2);
+        Rectangle rect = clevis.rectangle("rect1", 0, 0, 2, 2);
         clevis.move("rect1", 3, 4);
-        Clevis.BoundingBox bbox = clevis.boundingBox("rect1");
+        BoundingBox bbox = clevis.boundingBox("rect1");
         assertEquals(3.0, bbox.x, 0.01);
         assertEquals(4.0, bbox.y, 0.01);
     }
@@ -121,7 +122,7 @@ public class ClevisTest {
     @Test
     public void testBoundingBox() {
         clevis.rectangle("r1", 1, 1, 4, 3);
-        Clevis.BoundingBox bbox = clevis.boundingBox("r1");
+        BoundingBox bbox = new clevis.boundingBox("r1");
         assertEquals(1.0, bbox.x, 0.01);
         assertEquals(1.0, bbox.y, 0.01);
         assertEquals(4.0, bbox.w, 0.01);
