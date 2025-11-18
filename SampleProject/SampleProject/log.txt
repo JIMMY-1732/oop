@@ -1,0 +1,2 @@
+rectangle rect1 10 10 10 10
+quit

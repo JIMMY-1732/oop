@@ -1,7 +1,11 @@
 package hk.edu.polyu.comp.comp2021.clevis;
 
 import hk.edu.polyu.comp.comp2021.clevis.model.Clevis;
-import hk.edu.polyu.comp.comp2021.clevis.model.shapes.*;
+import hk.edu.polyu.comp.comp2021.clevis.model.shapes.Circle;  
+import hk.edu.polyu.comp.comp2021.clevis.model.shapes.Line;    
+import hk.edu.polyu.comp.comp2021.clevis.model.shapes.Rectangle;
+import hk.edu.polyu.comp.comp2021.clevis.model.shapes.Shape;
+import hk.edu.polyu.comp.comp2021.clevis.model.shapes.Square;  
 
 
 import javax.swing.*;
@@ -32,22 +36,22 @@ public class ViewerFrame extends JFrame {
             g2.setStroke(new BasicStroke(2f));
 
             for (Shape s : clevis.all()) {
-                if (s instanceof Clevis.Rectangle) {
+                if (s instanceof Rectangle) {
                     //req2
-                    Clevis.Rectangle r = (Clevis.Rectangle) s;
+                    Rectangle r = (Rectangle) s;
                     g2.draw(new Rectangle2D.Double(r.x(), r.y(), r.w(), r.h()));
-                } else if (s instanceof Clevis.Line) {
+                } else if (s instanceof Line) {
                     //req3
-                    Clevis.Line l = (Clevis.Line) s;
+                    Line l = (Line) s;
                     g2.draw(new Line2D.Double(l.x1(), l.y1(), l.x2(), l.y2()));
-                } else if (s instanceof Clevis.Circle) {
+                } else if (s instanceof Circle) {
                     //req4
-                    Clevis.Circle c = (Clevis.Circle) s;
+                    Circle c = (Circle) s;
                     double d = 2 * c.r();
                     g2.draw(new Ellipse2D.Double(c.cx() - c.r(), c.cy() - c.r(), d, d));
-                } else if (s instanceof Clevis.Square) {
+                } else if (s instanceof Square) {
                     //req5
-                    Clevis.Square sq = (Clevis.Square) s;
+                    Square sq = (Square) s;
                     g2.draw(new Rectangle2D.Double(sq.x(), sq.y(), sq.s(), sq.s()));
                 }
             }
