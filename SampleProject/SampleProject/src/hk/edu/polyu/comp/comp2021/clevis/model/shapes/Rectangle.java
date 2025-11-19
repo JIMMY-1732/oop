@@ -1,5 +1,7 @@
 package hk.edu.polyu.comp.comp2021.clevis.model.shapes;
 
+import hk.edu.polyu.comp.comp2021.clevis.model.operations.ShapeQueryHandler;
+
 import java.util.Locale;
 
 /**
@@ -10,7 +12,7 @@ public final class Rectangle implements Shape {
     private final String name;
     private final int z;
     public final double x, y, w, h;
-    
+
     /**
      * Creates a rectangle.
      * @param name unique name for the rectangle
@@ -28,25 +30,67 @@ public final class Rectangle implements Shape {
         if (w <= 0 || h <= 0) {
             throw new IllegalArgumentException("width and height must be positive!!");
         }
-        this.name = name; 
+        this.name = name;
         this.z = z;
-        this.x = x; 
-        this.y = y; 
-        this.w = w; 
+        this.x = x;
+        this.y = y;
+        this.w = w;
         this.h = h;
     }
-    
+
     @Override public String name() { return name; }
     @Override public int z() { return z; }
     @Override public BoundingBox bbox() { return new BoundingBox(x, y, w, h); }
-    
-    @Override 
+
+    @Override
     public String listInfo() {
         return String.format(Locale.US, "%s rectangle %.2f %.2f %.2f %.2f", name, x, y, w, h);
     }
-    
+
     public double x() { return x; }
     public double y() { return y; }
     public double w() { return w; }
     public double h() { return h; }
+    @Override
+    public boolean intersects(Shape other) {
+        if (other instanceof Rectangle || other instanceof Square) {
+            Rectangle r = (Rectangle) other;
+
+            // Two rectangles intersect if they overlap but neither contains the other
+            boolean overlap = !(this.x + this.w <= r.x || r.x + r.w <= this.x ||
+                    this.y + this.h <= r.y || r.y + r.h <= this.y);
+
+            if (!overlap) return false;
+
+            // Check if one completely contains the other
+            boolean thisContainsOther = (this.x <= r.x && this.x + this.w >= r.x + r.w &&
+                    this.y <= r.y && this.y + this.h >= r.y + r.h);
+            boolean otherContainsThis = (r.x <= this.x && r.x + r.w >= this.x + this.w &&
+                    r.y <= this.y && r.y + r.h >= this.y + this.h);
+
+            return overlap && !thisContainsOther && !otherContainsThis;
+        }
+
+        if (other instanceof Circle) {
+            Circle c = (Circle) other;
+            return ShapeQueryHandler.circleIntersectsRectangle(
+                    c.centerX, c.centerY, c.radius,
+                    this.x, this.y, this.w, this.h
+            );
+        }
+
+        if (other instanceof Line) {
+            Line line = (Line) other;
+            return ShapeQueryHandler.lineIntersectsRectangle(
+                    line.x1(), line.y1(), line.x2(), line.y2(),
+                    this.x, this.y, this.w, this.h
+            );
+        }
+
+        if (other instanceof Group) {
+            return other.intersects(this);
+        }
+
+        return false;
+    }
 }

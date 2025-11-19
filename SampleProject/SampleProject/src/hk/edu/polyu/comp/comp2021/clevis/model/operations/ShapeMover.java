@@ -70,7 +70,7 @@ public class ShapeMover {
             replaceShapeInCollections(circle, moved);
         } else if (shape instanceof Square square) {
             Square moved = new Square(square.name(), square.z, 
-                square.x + dx, square.y + dy, square.sideLength);
+                square.x + dx, square.y + dy, square.length);
             replaceShapeInCollections(square, moved);
         }
     }

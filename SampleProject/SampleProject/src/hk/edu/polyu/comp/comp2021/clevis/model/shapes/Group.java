@@ -77,4 +77,29 @@ public final class Group implements Shape {
     public List<Shape> getShapes() {
         return new ArrayList<>(shapes);
     }
+    @Override
+    public boolean intersects(Shape other) {
+        if (other instanceof Group) {
+            Group otherGroup = (Group) other;
+
+            // Check if any shape in this group intersects with any shape in the other group
+            for (Shape thisShape : this.shapes) {
+                for (Shape otherShape : otherGroup.shapes) {
+                    if (thisShape.intersects(otherShape)) {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+
+        // For non-group shapes, check if any member of this group intersects with it
+        for (Shape shape : this.shapes) {
+            if (shape.intersects(other)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
 }

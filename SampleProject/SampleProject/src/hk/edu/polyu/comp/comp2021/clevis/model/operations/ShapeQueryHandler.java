@@ -80,9 +80,9 @@ public class ShapeQueryHandler {
 
     /**
      * Checks if two shapes intersect (REQ12).
-     * Two shapes intersect if their bounding boxes share any INTERNAL points.
-     * This means the bounding boxes must overlap with a non-zero area,
-     * not just touch at edges or corners.
+     * Two shapes intersect if they share any points or cross each other.
+     * Uses actual geometric intersection, not just bounding box overlap.
+     *
      * @param name1 name of first shape
      * @param name2 name of second shape
      * @return true if the shapes intersect
@@ -103,40 +103,142 @@ public class ShapeQueryHandler {
             throw new IllegalArgumentException("Shape not found: " + name2);
         }
 
-        return doBoundingBoxesIntersect(shape1.bbox(), shape2.bbox());
+        // Use the shape's own intersects method for proper geometric intersection
+        return shape1.intersects(shape2);
+    }
+
+    // ============================================================================
+    // GEOMETRIC INTERSECTION HELPERS
+    // These are public static so shapes can use them
+    // ============================================================================
+
+    /**
+     * Check if a line segment intersects with a circle.
+     */
+    public static boolean lineIntersectsCircle(double x1, double y1, double x2, double y2,
+                                               double cx, double cy, double radius) {
+        // Find the closest point on the line segment to the circle center
+        double dx = x2 - x1;
+        double dy = y2 - y1;
+
+        if (dx == 0 && dy == 0) {
+            // Line segment is a point
+            double dist = Math.sqrt((x1 - cx) * (x1 - cx) + (y1 - cy) * (y1 - cy));
+            return dist <= radius;
+        }
+
+        // Parameter t represents position along line segment (0 to 1)
+        double t = ((cx - x1) * dx + (cy - y1) * dy) / (dx * dx + dy * dy);
+        t = Math.max(0, Math.min(1, t)); // Clamp to [0, 1]
+
+        // Find closest point on segment
+        double closestX = x1 + t * dx;
+        double closestY = y1 + t * dy;
+
+        // Check distance from circle center to closest point
+        double distance = Math.sqrt(
+                (closestX - cx) * (closestX - cx) +
+                        (closestY - cy) * (closestY - cy)
+        );
+
+        return distance <= radius;
     }
 
     /**
-     * Check if two bounding boxes share INTERNAL points.
-     * They must have overlapping area, not just touching edges.
-     *
-     * Using STRICT inequality (<) means:
-     * - If one box's right edge equals another's left edge, they DON'T intersect
-     * - If one box is completely inside another, they DO intersect
-     * - If boxes overlap with non-zero area, they DO intersect
+     * Check if a line segment intersects with a rectangle.
      */
-    private boolean doBoundingBoxesIntersect(BoundingBox box1, BoundingBox box2) {
-        // Check if separated horizontally (with strict inequality)
-        // box1 is completely to the left of box2
-        if (box1.x + box1.w <= box2.x) {
-            return false;
+    public static boolean lineIntersectsRectangle(double x1, double y1, double x2, double y2,
+                                                  double rx, double ry, double rw, double rh) {
+        // Check if either endpoint is inside the rectangle
+        if (pointInRectangle(x1, y1, rx, ry, rw, rh) ||
+                pointInRectangle(x2, y2, rx, ry, rw, rh)) {
+            return true;
         }
-        // box2 is completely to the left of box1
-        if (box2.x + box2.w <= box1.x) {
+
+        // Check if line intersects any of the four edges of the rectangle
+        // Top edge
+        if (lineSegmentsIntersect(x1, y1, x2, y2, rx, ry, rx + rw, ry)) return true;
+        // Bottom edge
+        if (lineSegmentsIntersect(x1, y1, x2, y2, rx, ry + rh, rx + rw, ry + rh)) return true;
+        // Left edge
+        if (lineSegmentsIntersect(x1, y1, x2, y2, rx, ry, rx, ry + rh)) return true;
+        // Right edge
+        if (lineSegmentsIntersect(x1, y1, x2, y2, rx + rw, ry, rx + rw, ry + rh)) return true;
+
+        return false;
+    }
+
+    /**
+     * Check if a circle intersects with a rectangle.
+     */
+    public static boolean circleIntersectsRectangle(double cx, double cy, double radius,
+                                                    double rx, double ry, double rw, double rh) {
+        // Find the closest point on the rectangle to the circle center
+        double closestX = Math.max(rx, Math.min(cx, rx + rw));
+        double closestY = Math.max(ry, Math.min(cy, ry + rh));
+
+        // Calculate distance from circle center to this closest point
+        double dx = cx - closestX;
+        double dy = cy - closestY;
+        double distanceSquared = dx * dx + dy * dy;
+
+        // Circle intersects if distance is less than radius
+        // AND circle is not completely containing the rectangle
+        if (distanceSquared > radius * radius) {
+            return false; // Too far away
+        }
+
+        // Check if circle center is inside rectangle (circle might contain it)
+        boolean centerInside = (cx >= rx && cx <= rx + rw && cy >= ry && cy <= ry + rh);
+
+        if (centerInside) {
+            // Circle center is inside - they intersect unless circle completely contains rectangle
+            // Check if any corner of rectangle is outside the circle
+            double r2 = radius * radius;
+            if (distSquared(cx, cy, rx, ry) > r2) return true;
+            if (distSquared(cx, cy, rx + rw, ry) > r2) return true;
+            if (distSquared(cx, cy, rx, ry + rh) > r2) return true;
+            if (distSquared(cx, cy, rx + rw, ry + rh) > r2) return true;
+
+            // All corners inside circle - circle contains rectangle (no intersection)
             return false;
         }
 
-        // Check if separated vertically (with strict inequality)
-        // box1 is completely above box2
-        if (box1.y + box1.h <= box2.y) {
-            return false;
-        }
-        // box2 is completely above box1
-        if (box2.y + box2.h <= box1.y) {
+        return true; // Distance is within radius and center not inside
+    }
+
+    /**
+     * Check if two line segments intersect.
+     */
+    public static boolean lineSegmentsIntersect(double x1, double y1, double x2, double y2,
+                                                double x3, double y3, double x4, double y4) {
+        double d = (x1 - x2) * (y3 - y4) - (y1 - y2) * (x3 - x4);
+
+        if (Math.abs(d) < 1e-10) {
+            // Lines are parallel or coincident
             return false;
         }
 
-        // If not separated in any direction, they must share internal points
-        return true;
+        double t = ((x1 - x3) * (y3 - y4) - (y1 - y3) * (x3 - x4)) / d;
+        double u = -((x1 - x2) * (y1 - y3) - (y1 - y2) * (x1 - x3)) / d;
+
+        return t >= 0 && t <= 1 && u >= 0 && u <= 1;
+    }
+
+    /**
+     * Check if a point is inside a rectangle.
+     */
+    public static boolean pointInRectangle(double px, double py, double rx, double ry,
+                                           double rw, double rh) {
+        return px >= rx && px <= rx + rw && py >= ry && py <= ry + rh;
+    }
+
+    /**
+     * Calculate squared distance between two points.
+     */
+    private static double distSquared(double x1, double y1, double x2, double y2) {
+        double dx = x2 - x1;
+        double dy = y2 - y1;
+        return dx * dx + dy * dy;
     }
 }

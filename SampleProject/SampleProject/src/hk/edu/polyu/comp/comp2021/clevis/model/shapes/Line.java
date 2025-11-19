@@ -1,5 +1,7 @@
 package hk.edu.polyu.comp.comp2021.clevis.model.shapes;
 
+import hk.edu.polyu.comp.comp2021.clevis.model.operations.ShapeQueryHandler;
+
 import java.util.Locale;
 
 /**
@@ -55,4 +57,36 @@ public final class Line implements Shape {
     public double y1() { return y1; }
     public double x2() { return x2; }
     public double y2() { return y2; }
+    @Override
+    public boolean intersects(Shape other) {
+        if (other instanceof Line) {
+            Line line = (Line) other;
+            return ShapeQueryHandler.lineSegmentsIntersect(
+                    this.x1, this.y1, this.x2, this.y2,
+                    line.x1, line.y1, line.x2, line.y2
+            );
+        }
+
+        if (other instanceof Circle) {
+            Circle c = (Circle) other;
+            return ShapeQueryHandler.lineIntersectsCircle(
+                    this.x1, this.y1, this.x2, this.y2,
+                    c.centerX, c.centerY, c.radius
+            );
+        }
+
+        if (other instanceof Rectangle || other instanceof Square) {
+            Rectangle r = (Rectangle) other;
+            return ShapeQueryHandler.lineIntersectsRectangle(
+                    this.x1, this.y1, this.x2, this.y2,
+                    r.x(), r.y(), r.w(), r.h()
+            );
+        }
+
+        if (other instanceof Group) {
+            return other.intersects(this);
+        }
+
+        return false;
+    }
 }

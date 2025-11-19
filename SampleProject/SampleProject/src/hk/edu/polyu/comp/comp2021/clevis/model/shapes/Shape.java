@@ -24,4 +24,6 @@ public interface Shape {
      * @return formatted string containing basic shape information (REQ13)
      */
     String listInfo();
+
+    boolean intersects(Shape other);
 }

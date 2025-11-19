@@ -1,5 +1,7 @@
 package hk.edu.polyu.comp.comp2021.clevis.model.shapes;
 
+import hk.edu.polyu.comp.comp2021.clevis.model.operations.ShapeQueryHandler;
+
 import java.util.Locale;
 
 /**
@@ -50,8 +52,45 @@ public final class Circle implements Shape {
     public String listInfo() {
         return String.format(Locale.US, "%s circle %.2f %.2f %.2f", name, centerX, centerY, radius);
     }
-    
     public double cx() { return centerX; }
     public double cy() { return centerY; }
     public double r()  { return radius; }
+    @Override
+    public boolean intersects(Shape other) {
+        if (other instanceof Circle) {
+            Circle c = (Circle) other;
+            double distance = Math.sqrt(
+                    Math.pow(this.centerX - c.centerX, 2) +
+                            Math.pow(this.centerY - c.centerY, 2)
+            );
+
+            // Two circles intersect if they overlap but neither contains the other
+            double sumRadii = this.radius + c.radius;
+            double diffRadii = Math.abs(this.radius - c.radius);
+
+            return distance < sumRadii && distance > diffRadii;
+        }
+
+        if (other instanceof Rectangle || other instanceof Square) {
+            Rectangle r = (Rectangle) other;
+            return ShapeQueryHandler.circleIntersectsRectangle(
+                    this.centerX, this.centerY, this.radius,
+                    r.x(), r.y(), r.w(), r.h()
+            );
+        }
+
+        if (other instanceof Line) {
+            Line line = (Line) other;
+            return ShapeQueryHandler.lineIntersectsCircle(
+                    line.x1(), line.y1(), line.x2(), line.y2(),
+                    this.centerX, this.centerY, this.radius
+            );
+        }
+
+        if (other instanceof Group) {
+            return other.intersects(this);
+        }
+
+        return false;
+    }
 }

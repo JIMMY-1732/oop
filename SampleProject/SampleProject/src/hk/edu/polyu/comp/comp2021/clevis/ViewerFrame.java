@@ -1,11 +1,9 @@
 package hk.edu.polyu.comp.comp2021.clevis;
 
 import hk.edu.polyu.comp.comp2021.clevis.model.Clevis;
-import hk.edu.polyu.comp.comp2021.clevis.model.shapes.Circle;  
-import hk.edu.polyu.comp.comp2021.clevis.model.shapes.Line;    
+import hk.edu.polyu.comp.comp2021.clevis.model.shapes.*;
 import hk.edu.polyu.comp.comp2021.clevis.model.shapes.Rectangle;
 import hk.edu.polyu.comp.comp2021.clevis.model.shapes.Shape;
-import hk.edu.polyu.comp.comp2021.clevis.model.shapes.Square;  
 
 
 import javax.swing.*;

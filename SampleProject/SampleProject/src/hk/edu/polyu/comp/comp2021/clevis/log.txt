@@ -1,9 +1,5 @@
-circle a 10 20 30
-circle b 10 20 40
-group c a b
-list a
-list a
-list a
-list b
-list b
+circle a 10 20
+circle a 100 100 60
+circle b 100 100 70
+intersect a b
 quit

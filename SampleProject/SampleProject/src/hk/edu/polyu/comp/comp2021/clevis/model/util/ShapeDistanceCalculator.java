@@ -70,7 +70,7 @@ public class ShapeDistanceCalculator {
     private static double distanceToSquare(Square square, double x, double y) {
         return distanceToRectangle(
             new Rectangle(square.name(), square.z(), square.x, square.y, 
-                          square.sideLength, square.sideLength),
+                          square.length, square.length),
             x, y
         );
     }
