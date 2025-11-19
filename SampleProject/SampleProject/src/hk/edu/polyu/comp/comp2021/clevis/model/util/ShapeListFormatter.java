@@ -1,5 +1,6 @@
 package hk.edu.polyu.comp.comp2021.clevis.model.util;
 
+import hk.edu.polyu.comp.comp2021.clevis.model.operations.GroupManager;
 import hk.edu.polyu.comp.comp2021.clevis.model.shapes.*;
 import java.util.*;
 
@@ -10,12 +11,17 @@ import java.util.*;
 public class ShapeListFormatter {
     private final Map<String, Shape> shapes;
     private final Map<String, Group> groups;
-    
-    public ShapeListFormatter(Map<String, Shape> shapes, Map<String, Group> groups) {
+    private final List<Shape> drawOrder;
+    private final GroupManager groupManager;  // ADD THIS
+
+    public ShapeListFormatter(Map<String, Shape> shapes, Map<String, Group> groups,
+                              List<Shape> drawOrder, GroupManager groupManager) {  // ADD PARAMETERS
         this.shapes = shapes;
         this.groups = groups;
+        this.drawOrder = drawOrder;  // ADD THIS
+        this.groupManager = groupManager;  // ADD THIS
     }
-    
+
     /**
      * Lists basic information about a single shape (REQ13).
      * @param name name of the shape
@@ -26,45 +32,67 @@ public class ShapeListFormatter {
         if (name == null || name.isBlank()) {
             throw new IllegalArgumentException("Shape name cannot be null or empty");
         }
-        
+        if (groupManager.isHidden(name)) {  // FIXED: Use instance method
+            if (Math.random() < 0.3) {
+                throw new IllegalArgumentException(
+                                "\n  /\\_/\\  \n" +
+                                " ( o.o ) \n" +
+                                "  > ^ <  \n" +
+                                "Meow meow my human,"+name+ " is in the group, and you found me. So Stop, Meow!"
+                );
+            } else {
+                throw new IllegalArgumentException("Dude,"+name+ " is in the group, but Maybe try this command again. Maybe you will get something unexpected ^-^");
+            }
+        }
+
         Shape shape = shapes.get(name);
         if (shape == null) {
             throw new IllegalArgumentException("Shape not found: " + name);
         }
-        
+
         return shape.listInfo();
     }
-    
+
     /**
-     * Lists all shapes in decreasing Z-order with indentation for groups (REQ14).
-     * @return formatted string listing all shapes
+     * Lists all shapes (REQ14).
+     * Shows all top-level shapes (not hidden in groups), sorted by z-index.
+     * Groups are expanded to show their members with indentation.
+     * @return formatted string with all shapes
      */
     public String listAll() {
-        List<Shape> roots = new ArrayList<>();
-        Set<Shape> nestedShapes = new HashSet<>();
-        
-        for (Group group : groups.values()) {
-            collectNestedShapes(group, nestedShapes);
+        if (shapes.isEmpty()) {
+            return "";
         }
-        
-        for (Shape shape : shapes.values()) {
-            if (!nestedShapes.contains(shape)) {
-                roots.add(shape);
+
+        StringBuilder result = new StringBuilder();
+
+        // Sort shapes by z-index (ascending order)
+        List<Shape> sortedShapes = new ArrayList<>(drawOrder);
+        sortedShapes.sort(Comparator.comparingInt(Shape::z));
+
+        for (Shape shape : sortedShapes) {
+            // Skip hidden shapes (they're part of groups)
+            if (groupManager.isHidden(shape.name())) {  // FIXED: Use instance method
+                continue;
             }
+
+            result.append(formatShape(shape)).append("\n");
         }
-        
-        roots.sort(Comparator.comparingInt(Shape::z).reversed());
-        
+
+        return result.toString().trim();
+    }
+
+    /**
+     * Format a single shape (used by listAll).
+     * For groups, recursively formats members with indentation.
+     */
+    private String formatShape(Shape shape) {
         StringBuilder sb = new StringBuilder();
         Set<Shape> visited = new HashSet<>();
-        
-        for (Shape root : roots) {
-            appendShapeInfo(root, 0, sb, visited);
-        }
-        
+        appendShapeInfo(shape, 0, sb, visited);
         return sb.toString();
     }
-    
+
     private void collectNestedShapes(Group group, Set<Shape> nested) {
         for (Shape member : group.getShapes()) {
             if (nested.add(member) && member instanceof Group) {
@@ -72,19 +100,19 @@ public class ShapeListFormatter {
             }
         }
     }
-    
+
     private void appendShapeInfo(Shape shape, int depth, StringBuilder sb, Set<Shape> visited) {
         if (!visited.add(shape)) {
             return;
         }
-        
+
         if (sb.length() > 0) {
             sb.append(System.lineSeparator());
         }
-        
+
         String indent = depth <= 0 ? "" : "  ".repeat(depth);
         sb.append(indent).append(shape.listInfo());
-        
+
         if (shape instanceof Group) {
             List<Shape> members = new ArrayList<>(((Group) shape).getShapes());
             members.sort(Comparator.comparingInt(Shape::z).reversed());

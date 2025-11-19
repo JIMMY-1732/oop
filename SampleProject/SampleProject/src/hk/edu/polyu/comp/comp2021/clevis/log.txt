@@ -1,0 +1,9 @@
+circle a 10 20 30
+circle b 10 20 40
+group c a b
+list a
+list a
+list a
+list b
+list b
+quit

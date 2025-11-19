@@ -123,12 +123,13 @@ public class ClevisTest {
     @Test
     public void testBoundingBox() {
         clevis.rectangle("r1", 1, 1, 4, 3);
-        BoundingBox bbox = new BoundingBox(1,1,4,3);
+        BoundingBox bbox = new BoundingBox(1, 1, 4, 3);
         assertEquals(1.0, bbox.x, 0.01);
         assertEquals(1.0, bbox.y, 0.01);
         assertEquals(4.0, bbox.w, 0.01);
         assertEquals(3.0, bbox.h, 0.01);
     }
+
     // List operations tests
     @Test
     public void testList() {

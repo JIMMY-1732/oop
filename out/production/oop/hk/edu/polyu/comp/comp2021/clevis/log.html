@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Clevis Command Log</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        h2 { color: #333; }
+        table { border-collapse: collapse; width: 100%; max-width: 800px; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        th { background-color: #4CAF50; color: white; }
+        tr:nth-child(even) { background-color: #f2f2f2; }
+    </style>
+</head>
+<body>
+    <h2>Clevis Session Command Log</h2>
+    <table>
+        <tr><th>Operation Index</th><th>Operation Command</th></tr>
+        <tr><td>1</td><td>rectangle dj 200 200 38 38</td></tr>
+        <tr><td>2</td><td>line bd 20 20 50 50</td></tr>
+        <tr><td>3</td><td>circle dh 40 40 15</td></tr>
+        <tr><td>4</td><td>square fh 100 100 80</td></tr>
+        <tr><td>5</td><td>move dh 50 50</td></tr>
+        <tr><td>6</td><td>group fj dh fh bd</td></tr>
+        <tr><td>7</td><td>delete dh</td></tr>
+        <tr><td>8</td><td>delete fh</td></tr>
+        <tr><td>9</td><td>ungroup fj</td></tr>
+        <tr><td>10</td><td>ungroup fj</td></tr>
+        <tr><td>11</td><td>ungroup bd</td></tr>
+        <tr><td>12</td><td>boundingbox fj</td></tr>
+        <tr><td>13</td><td>boundingbox bd</td></tr>
+        <tr><td>14</td><td>shapeAt 20 20</td></tr>
+        <tr><td>15</td><td>circle 20 40 50</td></tr>
+        <tr><td>16</td><td>circle hd 20 20 40</td></tr>
+        <tr><td>17</td><td>intersect hd bd</td></tr>
+        <tr><td>18</td><td>list hd</td></tr>
+        <tr><td>19</td><td>listAll</td></tr>
+        <tr><td>20</td><td>quit</td></tr>
+    </table>
+</body>
+</html>

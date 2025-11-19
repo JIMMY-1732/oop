@@ -11,6 +11,7 @@ import java.util.*;
  * This class serves as the facade for the model layer in the MVC pattern.
  */
 public class Clevis {
+    public static Group group;
     // Core data structures
     public Map<String, Shape> shapes = new LinkedHashMap<>();
     public List<Shape> drawOrder = new ArrayList<>();
@@ -33,10 +34,10 @@ public class Clevis {
         this.groups = new HashMap<>();
         this.factory = new ShapeFactory(shapes, drawOrder);
         this.groupManager = new GroupManager(shapes, drawOrder, groups, factory);
-        this.shapeManager = new ShapeManager(shapes, drawOrder, groups);
+        this.shapeManager = new ShapeManager(shapes, drawOrder, groups, groupManager);
         this.mover = new ShapeMover(shapes, drawOrder, groups);
         this.queryHandler = new ShapeQueryHandler(shapes, drawOrder);
-        this.formatter = new ShapeListFormatter(shapes, groups);
+        this.formatter = new ShapeListFormatter(shapes, groups,drawOrder,groupManager);
     }
     
     /**
@@ -126,7 +127,5 @@ public class Clevis {
         return formatter.list(name);
     }
     
-    public String listAll() {
-        return formatter.listAll();
-    }
+    public String listAll() { return formatter.listAll(); }
 }

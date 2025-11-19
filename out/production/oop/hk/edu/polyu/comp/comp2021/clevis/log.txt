@@ -1,0 +1,20 @@
+rectangle dj 200 200 38 38
+line bd 20 20 50 50
+circle dh 40 40 15
+square fh 100 100 80
+move dh 50 50
+group fj dh fh bd
+delete dh
+delete fh
+ungroup fj
+ungroup fj
+ungroup bd
+boundingbox fj
+boundingbox bd
+shapeAt 20 20
+circle 20 40 50
+circle hd 20 20 40
+intersect hd bd
+list hd
+listAll
+quit
