@@ -81,7 +81,6 @@ public class ShapeMover {
     
     private void replaceShapeInCollections(Shape oldShape, Shape newShape) {
         shapes.put(newShape.name(), newShape);
-        
         int index = drawOrder.indexOf(oldShape);
         if (index >= 0) {
             drawOrder.set(index, newShape);

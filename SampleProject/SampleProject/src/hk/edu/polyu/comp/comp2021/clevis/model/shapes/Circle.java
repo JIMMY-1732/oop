@@ -66,17 +66,25 @@ public final class Circle implements Shape {
             double sumRadii = this.radius + c.radius;
 
             // True whenever there is at least one interior point in common.
-            return distance < sumRadii
+            return distance <= sumRadii
                     && distance + Math.min(this.radius, c.radius) >= Math.max(this.radius, c.radius);
 
         }
 
-        if (other instanceof Rectangle || other instanceof Square) {
+        if (other instanceof Rectangle) {
             Rectangle r = (Rectangle) other;
             return ShapeQueryHandler.circleIntersectsRectangle(
                     this.centerX, this.centerY, this.radius,
                     r.x(), r.y(), r.w(), r.h()
             );
+        }
+
+        if(other instanceof Square){
+            Square s = (Square) other;
+            return ShapeQueryHandler.circleIntersectsRectangle(
+                    this.centerX, this.centerY, this.radius,
+                    s.x(), s.y(), s.length, s.length);
+
         }
 
         if (other instanceof Line) {

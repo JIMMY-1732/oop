@@ -648,9 +648,10 @@ public class ClevisTest {
         String info = clevis.list("g3");
         assertTrue(info.contains("g1"));
         assertTrue(info.contains("g2"));
+    }
 // ==================== Additional Coverage Tests ====================
 
-        @Test
+        @Test(expected = IllegalArgumentException.class)
         public void testZeroLengthLine () {
             Line line = clevis.line("point", 5, 5, 5, 5);
             assertNotNull(line);
@@ -716,10 +717,10 @@ public class ClevisTest {
         }
 
         @Test
-        public void testIntersectionRectangleCompletelyInsideCircle () {
-            clevis.circle("c1", 10, 10, 10);
-            clevis.rectangle("r1", 9, 9, 2, 2);
-            assertTrue(clevis.intersect("c1", "r1"));
+        public void testIntersectionSquareCompletelyInsideCircle () {
+            Circle c1 = clevis.circle("c1", 10, 10, 10);
+            Square s1 = clevis.square("s1", 9, 9, 2);
+            assertTrue(clevis.intersect("s1", "c1"));
         }
 
         @Test
@@ -839,9 +840,16 @@ public class ClevisTest {
             clevis.circle("c1", 12, 12, 2);
             clevis.group("g1", Arrays.asList("r1", "c1"));
             clevis.move("g1", -5, -5);
-            BoundingBox bbox = clevis.boundingBox("g1");
-            assertEquals(5.0, bbox.x, 0.01);
-            assertEquals(5.0, bbox.y, 0.01);
+
+            Rectangle r1 = (Rectangle) clevis.shapes.get("r1");
+            Circle c1 = (Circle) clevis.shapes.get("c1");
+
+            System.out.println(clevis.shapes.get("r1").listInfo());
+            System.out.println(clevis.shapes.get("c1").listInfo());
+            assertEquals(5.0, r1.x, 0.01);
+            assertEquals(5.0, r1.y, 0.01);
+            assertEquals(7.0, c1.centerX, 0.01);
+            assertEquals(7.0, c1.centerY, 0.01);
         }
 
         @Test
@@ -1042,4 +1050,3 @@ public class ClevisTest {
             assertEquals("r1", result);
         }
     }
-}

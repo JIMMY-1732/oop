@@ -175,38 +175,31 @@ public class ShapeQueryHandler {
      */
     public static boolean circleIntersectsRectangle(double cx, double cy, double radius,
                                                     double rx, double ry, double rw, double rh) {
-        // Find the closest point on the rectangle to the circle center
         double closestX = Math.max(rx, Math.min(cx, rx + rw));
         double closestY = Math.max(ry, Math.min(cy, ry + rh));
 
-        // Calculate distance from circle center to this closest point
         double dx = cx - closestX;
         double dy = cy - closestY;
         double distanceSquared = dx * dx + dy * dy;
 
-        // Circle intersects if distance is less than radius
-        // AND circle is not completely containing the rectangle
-        if (distanceSquared > radius * radius) {
-            return false; // Too far away
+        if (distanceSquared <= radius * radius) {
+            return true; // circle reaches the rectangle
         }
 
-        // Check if circle center is inside rectangle (circle might contain it)
-        boolean centerInside = (cx >= rx && cx <= rx + rw && cy >= ry && cy <= ry + rh);
-
-        if (centerInside) {
-            // Circle center is inside - they intersect unless circle completely contains rectangle
-            // Check if any corner of rectangle is outside the circle
-            double r2 = radius * radius;
-            if (distSquared(cx, cy, rx, ry) > r2) return true;
-            if (distSquared(cx, cy, rx + rw, ry) > r2) return true;
-            if (distSquared(cx, cy, rx, ry + rh) > r2) return true;
-            if (distSquared(cx, cy, rx + rw, ry + rh) > r2) return true;
-
-            // All corners inside circle - circle contains rectangle (no intersection)
-            return false;
+        // Circle center inside rectangle? They intersect (circle crosses rectangle)
+        if (pointInRectangle(cx, cy, rx, ry, rw, rh)) {
+            return true;
         }
 
-        return true; // Distance is within radius and center not inside
+        // Circle might contain rectangle: check corners
+        double r2 = radius * radius;
+        boolean allCornersInside =
+                distSquared(cx, cy, rx, ry) <= r2 &&
+                        distSquared(cx, cy, rx + rw, ry) <= r2 &&
+                        distSquared(cx, cy, rx, ry + rh) <= r2 &&
+                        distSquared(cx, cy, rx + rw, ry + rh) <= r2;
+
+        return allCornersInside;
     }
 
     /**

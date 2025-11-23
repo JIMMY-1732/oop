@@ -1,4 +1,4 @@
-square squ01 100 100 100
-square squ02 150 150 20
-intersect squ01 squ02
+square s2 9 9 2
+circle c2 10 10 10
+intersect c2 s2
 quit

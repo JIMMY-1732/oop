@@ -75,12 +75,20 @@ public final class Line implements Shape {
             );
         }
 
-        if (other instanceof Rectangle || other instanceof Square) {
+        if (other instanceof Rectangle) {
             Rectangle r = (Rectangle) other;
             return ShapeQueryHandler.lineIntersectsRectangle(
                     this.x1, this.y1, this.x2, this.y2,
                     r.x(), r.y(), r.w(), r.h()
             );
+        }
+
+        if(other instanceof Square){
+            Square s = (Square) other;
+            return ShapeQueryHandler.lineIntersectsRectangle(
+                    this.x1, this.y1, this.x2, this.y2,
+                    s.x(), s.y(), s.length, s.length);
+
         }
 
         if (other instanceof Group) {

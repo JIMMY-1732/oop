@@ -28,9 +28,10 @@ public class ShapeManager {
      * @throws IllegalArgumentException if name is null/empty or shape doesn't exist
      */
     public void deleteShape(String name) {
-        if (name == null || name.isBlank()) {
+        if (shapes.get(name) == null || name == null || name.isBlank()) {
             throw new IllegalArgumentException("Shape name cannot be null or empty");
         }
+
 
 //        // NEW: Check if shape is hidden in a group
 //        if (groupManager.isHidden(name)) {
@@ -38,19 +39,24 @@ public class ShapeManager {
 //        }
 
         Shape shape = shapes.get(name);
+        System.out.println("Deleting shape " + shape.listInfo());
+
         if (shape == null) {
             throw new IllegalArgumentException("Shape not found: " + name);
         }
 
-        shapes.remove(name);
-        drawOrder.remove(shape);
-
-        if (shape instanceof Group) {
+        if (shape instanceof Group group) {
             groups.remove(name);
-            Shape[] removeItem = shapes.values().toArray(new Shape[0]);
-            for(Shape item : removeItem) {
-                deleteShape(item.name());
+            shapes.remove(name);
+            drawOrder.remove(shape);
+
+            for (Shape shape1 : group.getShapes()) {
+                deleteShape(shape1.name());
             }
+        } else {
+            shapes.remove(name);
+            drawOrder.remove(shape);
         }
+
     }
 }
