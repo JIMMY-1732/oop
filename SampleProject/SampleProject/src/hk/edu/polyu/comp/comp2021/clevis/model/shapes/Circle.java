@@ -59,16 +59,16 @@ public final class Circle implements Shape {
     public boolean intersects(Shape other) {
         if (other instanceof Circle) {
             Circle c = (Circle) other;
-            double distance = Math.sqrt(
-                    Math.pow(this.centerX - c.centerX, 2) +
-                            Math.pow(this.centerY - c.centerY, 2)
-            );
+            double dx = this.centerX - c.centerX;
+            double dy = this.centerY - c.centerY;
+            double distance = Math.hypot(dx, dy);
 
-            // Two circles intersect if they overlap but neither contains the other
             double sumRadii = this.radius + c.radius;
-            double diffRadii = Math.abs(this.radius - c.radius);
 
-            return distance < sumRadii && distance > diffRadii;
+            // True whenever there is at least one interior point in common.
+            return distance < sumRadii
+                    && distance + Math.min(this.radius, c.radius) > Math.max(this.radius, c.radius);
+
         }
 
         if (other instanceof Rectangle || other instanceof Square) {

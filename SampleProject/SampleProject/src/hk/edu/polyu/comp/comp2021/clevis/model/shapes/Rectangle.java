@@ -56,19 +56,10 @@ public final class Rectangle implements Shape {
         if (other instanceof Rectangle || other instanceof Square) {
             Rectangle r = (Rectangle) other;
 
-            // Two rectangles intersect if they overlap but neither contains the other
-            boolean overlap = !(this.x + this.w <= r.x || r.x + r.w <= this.x ||
-                    this.y + this.h <= r.y || r.y + r.h <= this.y);
+            boolean xOverlap = Math.max(this.x, r.x) < Math.min(this.x + this.w, r.x + r.w);
+            boolean yOverlap = Math.max(this.y, r.y) < Math.min(this.y + this.h, r.y + r.h);
 
-            if (!overlap) return false;
-
-            // Check if one completely contains the other
-            boolean thisContainsOther = (this.x <= r.x && this.x + this.w >= r.x + r.w &&
-                    this.y <= r.y && this.y + this.h >= r.y + r.h);
-            boolean otherContainsThis = (r.x <= this.x && r.x + r.w >= this.x + this.w &&
-                    r.y <= this.y && r.y + r.h >= this.y + this.h);
-
-            return overlap && !thisContainsOther && !otherContainsThis;
+            return xOverlap && yOverlap;
         }
 
         if (other instanceof Circle) {

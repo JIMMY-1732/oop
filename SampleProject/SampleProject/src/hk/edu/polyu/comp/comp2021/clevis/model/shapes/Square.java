@@ -57,51 +57,19 @@ public final class Square implements Shape {
         if (other instanceof Square) {
             Square s = (Square) other;
 
-            // Two squares intersect if they overlap but neither contains the other
-            boolean overlap = !(this.x + this.length <= s.x ||
-                    s.x + s.length <= this.x ||
-                    this.y + this.length <= s.y ||
-                    s.y + s.length <= this.y);
+            boolean xOverlap = Math.max(this.x, s.x) < Math.min(this.x + this.length, s.x + s.length);
+            boolean yOverlap = Math.max(this.y, s.y) < Math.min(this.y + this.length, s.y + s.length);
 
-            if (!overlap) return false;
-
-            // Check if one completely contains the other
-            boolean thisContainsOther = (this.x <= s.x &&
-                    this.x + this.length >= s.x + s.length &&
-                    this.y <= s.y &&
-                    this.y + this.length >= s.y + s.length);
-
-            boolean otherContainsThis = (s.x <= this.x &&
-                    s.x + s.length >= this.x + this.length &&
-                    s.y <= this.y &&
-                    s.y + s.length >= this.y + this.length);
-
-            return overlap && !thisContainsOther && !otherContainsThis;
+            return xOverlap && yOverlap;
         }
 
         if (other instanceof Rectangle) {
             Rectangle r = (Rectangle) other;
 
-            // Square vs Rectangle - treat square as rectangle
-            boolean overlap = !(this.x + this.length <= r.x() ||
-                    r.x() + r.w() <= this.x ||
-                    this.y + this.length <= r.y() ||
-                    r.y() + r.h() <= this.y);
+            boolean xOverlap = Math.max(this.x, r.x()) < Math.min(this.x + this.length, r.x() + r.w());
+            boolean yOverlap = Math.max(this.y, r.y()) < Math.min(this.y + this.length, r.y() + r.h());
 
-            if (!overlap) return false;
-
-            // Check if one completely contains the other
-            boolean thisContainsOther = (this.x <= r.x() &&
-                    this.x + this.length >= r.x() + r.w() &&
-                    this.y <= r.y() &&
-                    this.y + this.length >= r.y() + r.h());
-
-            boolean otherContainsThis = (r.x() <= this.x &&
-                    r.x() + r.w() >= this.x + this.length &&
-                    r.y() <= this.y &&
-                    r.y() + r.h() >= this.y + this.length);
-
-            return overlap && !thisContainsOther && !otherContainsThis;
+            return xOverlap && yOverlap;
         }
 
         if (other instanceof Circle) {

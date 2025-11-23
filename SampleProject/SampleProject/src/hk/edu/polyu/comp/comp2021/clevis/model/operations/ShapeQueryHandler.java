@@ -106,7 +106,6 @@ public class ShapeQueryHandler {
         if (shape2 == null) {
             throw new IllegalArgumentException("Shape not found: " + name2);
         }
-        System.out.println("Z: " + shape1.z() + " and " + shape2.z());
         // Use the shape's own intersects method for proper geometric intersection
         return shape1.intersects(shape2);
     }

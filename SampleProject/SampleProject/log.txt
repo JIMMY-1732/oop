@@ -1,7 +1,4 @@
-rectangle rect01 0 0 250 250
-rectangle rect02 50 50 50 50
-interscet rect01 rect02
-intersect rect01 rect02
-rectangle rect03 400 400 100 100
-intersect rect01 rect03
+square squ01 100 100 100
+square squ02 150 150 20
+intersect squ01 squ02
 quit
