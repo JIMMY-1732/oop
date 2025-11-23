@@ -52,14 +52,13 @@ public class ShapeQueryHandler {
         // Check all shapes in drawOrder and find the one with highest z-index
         for (Shape shape : drawOrder) {
 //            System.out.println(shape);
-//            System.out.println(shape.z());
 //            System.out.println(covers(shape, x, y));
             if (covers(shape, x, y)) {
-            int z = shape.z();
-            if (z > highestZ) {
-                highestZ = z;
-                topmost = shape;
-            }
+                int z = shape.z();
+                if (z > highestZ) {
+                    highestZ = z;
+                    topmost = shape;
+                }
             }
         }
 
@@ -78,7 +77,7 @@ public class ShapeQueryHandler {
         }
 
         double distance = ShapeDistanceCalculator.distanceToShape(shape, x, y);
-        System.out.println(distance);
+        System.out.println("distance " + distance);
         return distance < 0.05;
     }
 

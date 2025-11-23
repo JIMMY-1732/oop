@@ -67,7 +67,7 @@ public final class Circle implements Shape {
 
             // True whenever there is at least one interior point in common.
             return distance < sumRadii
-                    && distance + Math.min(this.radius, c.radius) > Math.max(this.radius, c.radius);
+                    && distance + Math.min(this.radius, c.radius) >= Math.max(this.radius, c.radius);
 
         }
 

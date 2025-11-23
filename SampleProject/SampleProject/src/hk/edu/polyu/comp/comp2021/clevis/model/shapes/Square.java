@@ -57,8 +57,8 @@ public final class Square implements Shape {
         if (other instanceof Square) {
             Square s = (Square) other;
 
-            boolean xOverlap = Math.max(this.x, s.x) < Math.min(this.x + this.length, s.x + s.length);
-            boolean yOverlap = Math.max(this.y, s.y) < Math.min(this.y + this.length, s.y + s.length);
+            boolean xOverlap = Math.max(this.x, s.x) <= Math.min(this.x + this.length, s.x + s.length);
+            boolean yOverlap = Math.max(this.y, s.y) <= Math.min(this.y + this.length, s.y + s.length);
 
             return xOverlap && yOverlap;
         }
@@ -66,8 +66,8 @@ public final class Square implements Shape {
         if (other instanceof Rectangle) {
             Rectangle r = (Rectangle) other;
 
-            boolean xOverlap = Math.max(this.x, r.x()) < Math.min(this.x + this.length, r.x() + r.w());
-            boolean yOverlap = Math.max(this.y, r.y()) < Math.min(this.y + this.length, r.y() + r.h());
+            boolean xOverlap = Math.max(this.x, r.x()) <= Math.min(this.x + this.length, r.x() + r.w());
+            boolean yOverlap = Math.max(this.y, r.y()) <= Math.min(this.y + this.length, r.y() + r.h());
 
             return xOverlap && yOverlap;
         }

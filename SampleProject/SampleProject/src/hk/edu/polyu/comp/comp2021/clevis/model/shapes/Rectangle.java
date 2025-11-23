@@ -56,8 +56,8 @@ public final class Rectangle implements Shape {
         if (other instanceof Rectangle || other instanceof Square) {
             Rectangle r = (Rectangle) other;
 
-            boolean xOverlap = Math.max(this.x, r.x) < Math.min(this.x + this.w, r.x + r.w);
-            boolean yOverlap = Math.max(this.y, r.y) < Math.min(this.y + this.h, r.y + r.h);
+            boolean xOverlap = Math.max(this.x, r.x) <= Math.min(this.x + this.w, r.x + r.w);
+            boolean yOverlap = Math.max(this.y, r.y) <= Math.min(this.y + this.h, r.y + r.h);
 
             return xOverlap && yOverlap;
         }

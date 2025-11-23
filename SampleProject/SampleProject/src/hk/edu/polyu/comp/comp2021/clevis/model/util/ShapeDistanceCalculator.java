@@ -46,25 +46,28 @@ public class ShapeDistanceCalculator {
     }
     
     private static double distanceToRectangle(Rectangle rect, double x, double y) {
-        double rx = rect.x, ry = rect.y, rw = rect.w, rh = rect.h;
-        
-        if (x >= rx && x <= rx + rw && y >= ry && y <= ry + rh) {
-            return Math.min(
-                Math.min(x - rx, rx + rw - x),
-                Math.min(y - ry, ry + rh - y)
-            );
+        double rx = rect.x;
+        double ry = rect.y;
+        double rw = rect.w;
+        double rh = rect.h;
+
+        boolean inside = x >= rx && x <= rx + rw && y >= ry && y <= ry + rh;
+        if (inside) {
+            return 0.0;
         }
-        
-        double dx = Math.max(rx - x, Math.max(0, x - (rx + rw)));
-        double dy = Math.max(ry - y, Math.max(0, y - (ry + rh)));
-        return Math.sqrt(dx * dx + dy * dy);
+
+        double clampedX = Math.max(rx, Math.min(x, rx + rw));
+        double clampedY = Math.max(ry, Math.min(y, ry + rh));
+        double dx = x - clampedX;
+        double dy = y - clampedY;
+        return Math.hypot(dx, dy);
     }
     
     private static double distanceToCircle(Circle circle, double x, double y) {
         double dx = x - circle.centerX;
         double dy = y - circle.centerY;
-        double distance = Math.sqrt(dx * dx + dy * dy);
-        return Math.abs(distance - circle.radius);
+        double centerDistance = Math.hypot(dx, dy);
+        return Math.max(0.0, centerDistance - circle.radius);
     }
     
     private static double distanceToSquare(Square square, double x, double y) {
