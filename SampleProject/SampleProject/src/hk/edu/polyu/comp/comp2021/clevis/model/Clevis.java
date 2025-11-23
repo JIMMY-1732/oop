@@ -11,7 +11,7 @@ import java.util.*;
  * This class serves as the facade for the model layer in the MVC pattern.
  */
 public class Clevis {
-    public static Group group;
+//    public static Group group;
     // Core data structures
     public Map<String, Shape> shapes = new LinkedHashMap<>();
     public List<Shape> drawOrder = new ArrayList<>();

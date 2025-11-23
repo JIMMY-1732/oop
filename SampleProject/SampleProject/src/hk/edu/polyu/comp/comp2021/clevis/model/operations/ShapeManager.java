@@ -32,10 +32,10 @@ public class ShapeManager {
             throw new IllegalArgumentException("Shape name cannot be null or empty");
         }
 
-        // NEW: Check if shape is hidden in a group
-        if (groupManager.isHidden(name)) {
-            throw new IllegalArgumentException("Cannot delete shape that is part of a group: " + name);
-        }
+//        // NEW: Check if shape is hidden in a group
+//        if (groupManager.isHidden(name)) {
+//            throw new IllegalArgumentException("Cannot delete shape that is part of a group: " + name);
+//        }
 
         Shape shape = shapes.get(name);
         if (shape == null) {
@@ -47,6 +47,10 @@ public class ShapeManager {
 
         if (shape instanceof Group) {
             groups.remove(name);
+            Shape[] removeItem = shapes.values().toArray(new Shape[0]);
+            for(Shape item : removeItem) {
+                deleteShape(item.name());
+            }
         }
     }
 }

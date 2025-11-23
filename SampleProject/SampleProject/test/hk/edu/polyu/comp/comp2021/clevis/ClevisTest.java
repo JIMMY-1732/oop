@@ -2,6 +2,7 @@ package hk.edu.polyu.comp.comp2021.clevis;
 
 import hk.edu.polyu.comp.comp2021.clevis.model.Clevis;
 import hk.edu.polyu.comp.comp2021.clevis.model.shapes.*;
+import hk.edu.polyu.comp.comp2021.clevis.model.shapes.Group;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -72,13 +73,13 @@ public class ClevisTest {
             clevis.rectangle("r1", 0, 0, 2, 2);
             clevis.circle("c1", 1, 1, 1);
             List<String> shapes = Arrays.asList("r1", "c1");
-            clevis.group("g1", shapes);
+            Group g1 = clevis.group("g1", shapes);
             clevis.ungroup("g1");
 
             // Add debugging statements
-            System.out.println("Group g1 contents: " + Clevis.group.getShapes().get(Integer.parseInt("g1")));
-
-            assertNull(Clevis.group.getShapes().get(Integer.parseInt("g1")));
+//            System.out.println("Group g1 contents: " + g1.getShapes().get());
+            g1.getShapes().forEach(System.out::println);
+            assertTrue(g1.getShapes(), shapes);
         } catch (Exception e) {
             e.printStackTrace();
             fail("Test failed with exception: " + e.getMessage());
