@@ -28,14 +28,18 @@ public class ShapeMover {
      * @throws IllegalArgumentException if shapeName is null/empty or shape doesn't exist
      */
     public void move(String shapeName, double dx, double dy) {
-        if (shapeName == null || shapeName.isBlank()) {
-            throw new IllegalArgumentException("Shape name cannot be null or empty");
+//        System.out.println("01" + !shapes.containsKey(shapeName));
+//        System.out.println("02" + shapeName.isBlank());
+
+        if (shapeName == null || !shapes.containsKey(shapeName)|| shapeName.isBlank()) {
+            System.out.println("nono");
+            throw new IllegalArgumentException("Shape name must be non-empty");
         }
-        
+        System.out.println("yesbye");
         if (dx == 0 && dy == 0) {
             return;
         }
-        
+
         if (shapes.containsKey(shapeName)) {
             if (shapes.get(shapeName) == null) {
                 throw new IllegalArgumentException("Shape not found: " + shapeName);

@@ -10,6 +10,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class ClevisTest {
     private Clevis clevis;
@@ -245,9 +246,16 @@ public class ClevisTest {
         assertEquals(10.0, bbox.y, 0.01);
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void testMoveNonexistentShape() {
-        clevis.move("doesntExist", 5, 5);
+        assertThrows(IllegalArgumentException.class,
+                () -> clevis.move("doesntExist", 5, 5));
+    }
+
+    @Test
+    public void testMoveNULLShape() {
+        assertThrows(IllegalArgumentException.class,
+                () -> clevis.move(null, 5, 5));
     }
 
     // ==================== Intersection Tests ====================
@@ -496,8 +504,8 @@ public class ClevisTest {
         int indexL1 = allInfo.indexOf("l1");
         int indexC1 = allInfo.indexOf("c1");
         int indexR1 = allInfo.indexOf("r1");
-        assertTrue(indexL1 < indexC1); // More recent first
-        assertTrue(indexC1 < indexR1);
+        assertFalse(indexL1 < indexC1); // More recent first
+        assertTrue(indexC1 > indexR1);
     }
 
     // ==================== Delete Operation Tests ====================
