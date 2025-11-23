@@ -93,7 +93,7 @@ public class ShapeQueryHandler {
      */
     public boolean intersect(String name1, String name2) {
         if (name1 == null || name1.isBlank() || name2 == null || name2.isBlank()) {
-            throw new IllegalArgumentException("Shape names cannot be null or empty");
+            throw new IllegalArgumentException();
         }
 
         Shape shape1 = shapes.get(name1);
