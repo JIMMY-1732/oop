@@ -79,7 +79,7 @@ public class ClevisTest {
             // Add debugging statements
 //            System.out.println("Group g1 contents: " + g1.getShapes().get());
             g1.getShapes().forEach(System.out::println);
-            assertTrue(g1.getShapes(), shapes);
+            assertTrue(shapes.contains("r1") && shapes.contains("c1"));
         } catch (Exception e) {
             e.printStackTrace();
             fail("Test failed with exception: " + e.getMessage());
