@@ -47,16 +47,19 @@ public class ShapeQueryHandler {
      */
     public String shapeAt(double x, double y) {
         Shape topmost = null;
-        int highestZ = Integer.MIN_VALUE;
+        int highestZ = 0;
 
         // Check all shapes in drawOrder and find the one with highest z-index
         for (Shape shape : drawOrder) {
+//            System.out.println(shape);
+//            System.out.println(shape.z());
+//            System.out.println(covers(shape, x, y));
             if (covers(shape, x, y)) {
-                int z = shape.z();
-                if (z > highestZ) {
-                    highestZ = z;
-                    topmost = shape;
-                }
+            int z = shape.z();
+            if (z > highestZ) {
+                highestZ = z;
+                topmost = shape;
+            }
             }
         }
 
@@ -75,6 +78,7 @@ public class ShapeQueryHandler {
         }
 
         double distance = ShapeDistanceCalculator.distanceToShape(shape, x, y);
+        System.out.println(distance);
         return distance < 0.05;
     }
 
@@ -102,7 +106,7 @@ public class ShapeQueryHandler {
         if (shape2 == null) {
             throw new IllegalArgumentException("Shape not found: " + name2);
         }
-
+        System.out.println("Z: " + shape1.z() + " and " + shape2.z());
         // Use the shape's own intersects method for proper geometric intersection
         return shape1.intersects(shape2);
     }
